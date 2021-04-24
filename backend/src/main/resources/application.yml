@@ -1,20 +1,20 @@
-spring:
-    application:
-        name: FoodOrderingAndDeliverySystem
-
-    datasource:
-        url: jdbc:mysql://localhost:3306/cs353
-        username: cs353
-        password: cs353
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        
-    jpa:
-        hibernate:
-            ddl-auto: create
-    
-    data:
-        rest:
-            base-path: /api
-
 server:
-    port: 8080
+  port: 8080
+
+spring:
+  application:
+    name: FoodOrderingAndDeliverySystem
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/cs353
+    username: cs353
+    password: cs353
+  #    initialization-mode: always
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+#  data:
+#    rest:
+#      base-path: /api

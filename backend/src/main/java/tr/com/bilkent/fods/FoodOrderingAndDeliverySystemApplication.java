@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class FoodOrderingAndDeliverySystemApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(FoodOrderingAndDeliverySystemApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(FoodOrderingAndDeliverySystemApplication.class, args);
+    }
 }
