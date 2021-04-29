@@ -13,8 +13,4 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
-
-#  data:
-#    rest:
-#      base-path: /api
+      ddl-auto: update
