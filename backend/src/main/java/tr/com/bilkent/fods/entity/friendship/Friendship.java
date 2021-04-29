@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import tr.com.bilkent.fods.entity.message.Message;
 import tr.com.bilkent.fods.entity.customer.Customer;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.sql.Date;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,20 +23,18 @@ public class Friendship {
     @ManyToOne
     @MapsId("customerUsername")
     @JoinColumn(name = "customer_username")
-    private Customer customerUsername;
+    private Customer customer;
 
     @ManyToOne
     @MapsId("friendUsername")
     @JoinColumn(name = "friend_username")
-    private Customer friendUsername;
+    private Customer friend;
 
     @CreationTimestamp
     @Column(name = "from_date")
     private Date fromDate;
 
+    @NotNull
     @Column(name = "is_accepted")
-    private Boolean isAccepted;
-
-    @OneToMany(mappedBy = "friendship")
-    private Set<Message> messages;
+    private Boolean isAccepted = false;
 }

@@ -18,7 +18,7 @@ public class Schedule {
     @EmbeddedId
     private ScheduleKey scheduleKey;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @MapsId("rid")
     @JoinColumn(name = "rid")
     private Restaurant restaurant;

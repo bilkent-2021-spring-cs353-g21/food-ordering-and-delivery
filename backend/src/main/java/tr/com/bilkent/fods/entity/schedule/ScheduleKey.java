@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.io.Serializable;
 import java.time.DayOfWeek;
 
@@ -15,5 +17,6 @@ import java.time.DayOfWeek;
 public class ScheduleKey implements Serializable {
     private Long rid;
 
+    @Enumerated(EnumType.STRING)
     private DayOfWeek day;
 }

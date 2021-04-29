@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import tr.com.bilkent.fods.entity.customer.Customer;
+import tr.com.bilkent.fods.entity.enumconverter.MessageStatusConverter;
 import tr.com.bilkent.fods.entity.friendship.Friendship;
 
 import javax.persistence.*;
@@ -34,6 +35,7 @@ public class Message {
     @CreationTimestamp
     private Timestamp timestamp;
 
+    @Convert(converter = MessageStatusConverter.class)
     private MessageStatus status = MessageStatus.SENT;
 
     /**
