@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
@@ -28,15 +27,11 @@ import static javax.servlet.http.HttpServletResponse.*;
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(encoder());
-    }
-
-    @Bean
-    public PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
+        auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
     }
 
     @Override
@@ -54,20 +49,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint((req, resp, ex) -> resp.setStatus(SC_UNAUTHORIZED)).and()
 
                 .formLogin()
+                .loginPage("/login")
                 .loginProcessingUrl("/login")
+                .permitAll()
                 .successHandler((req, resp, auth) -> resp.setStatus(SC_OK))
-                .failureHandler((req, resp, ex) -> resp.setStatus(SC_FORBIDDEN)).and()
+                .failureHandler((req, resp, ex) -> resp.setStatus(SC_UNAUTHORIZED)).and()
 
-                .sessionManagement().invalidSessionStrategy((req, resp) -> resp.setStatus(499)).and()
+//                .sessionManagement().invalidSessionStrategy((req, resp) -> resp.setStatus(SC_UNAUTHORIZED)).and()
 
-                .logout().logoutUrl("/logout").logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
+                .logout()
+                .logoutUrl("/logout")
+                .permitAll()
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(Collections.singletonList("*"));
+        configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Cookie",

@@ -10,22 +10,27 @@ import java.time.Instant;
 @Getter
 @Setter
 @ToString
-public class CustomHTTPResponse {
-    private Object message;
-    private String error;
+public class CustomHTTPResponse<T> {
+    private T data;
+    private String message;
     private Timestamp timestamp;
 
     public CustomHTTPResponse() {
         this.timestamp = Timestamp.from(Instant.now());
     }
 
-    public CustomHTTPResponse(Object message) {
+    public CustomHTTPResponse(T data) {
+        this();
+        this.data = data;
+    }
+
+    public CustomHTTPResponse(String message) {
         this();
         this.message = message;
     }
 
-    public CustomHTTPResponse(Object message, String error) {
-        this(message);
-        this.error = error;
+    public CustomHTTPResponse(T data, String message) {
+        this(data);
+        this.message = message;
     }
 }

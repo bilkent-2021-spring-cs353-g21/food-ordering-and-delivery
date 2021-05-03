@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tr.com.bilkent.fods.dto.user.CustomerDTO;
 import tr.com.bilkent.fods.dto.rest.CustomHTTPResponse;
+import tr.com.bilkent.fods.dto.user.UserDTO;
+import tr.com.bilkent.fods.entity.customer.Customer;
 import tr.com.bilkent.fods.service.UserService;
 
 import javax.validation.Valid;
@@ -24,9 +25,9 @@ public class CustomerController {
     }
 
     @PostMapping("/register")
-    public CustomHTTPResponse register(@RequestBody @Valid CustomerDTO customer) {
-        log.debug("Customer register request: {}", customer);
-        userService.register(customer);
-        return new CustomHTTPResponse("success");
+    public CustomHTTPResponse<Void> register(@RequestBody @Valid UserDTO customer) {
+        log.info("Customer register request: {}", customer);
+        userService.register(customer, Customer.class);
+        return new CustomHTTPResponse<>("success");
     }
 }

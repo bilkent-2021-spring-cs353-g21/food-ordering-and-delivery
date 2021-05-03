@@ -2,14 +2,10 @@ package tr.com.bilkent.fods.service;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import tr.com.bilkent.fods.dto.user.CustomerDTO;
-import tr.com.bilkent.fods.dto.user.DelivererDTO;
-import tr.com.bilkent.fods.dto.user.RestaurantManagerDTO;
+import tr.com.bilkent.fods.dto.user.EditUserDTO;
 import tr.com.bilkent.fods.dto.user.UserDTO;
 import tr.com.bilkent.fods.entity.User;
 import tr.com.bilkent.fods.entity.customer.Customer;
@@ -25,7 +21,6 @@ public class UserService {
     private final CustomerRepository customerRepository;
     private final RestaurantManagerRepository restaurantManagerRepository;
     private final DelivererRepository delivererRepository;
-    private final UserDetailsService userDetailsService;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -33,47 +28,78 @@ public class UserService {
     public UserService(CustomerRepository customerRepository,
                        RestaurantManagerRepository restaurantManagerRepository,
                        DelivererRepository delivererRepository,
-                       UserDetailsService userDetailsService,
+                       ModelMapper modelMapper,
                        PasswordEncoder passwordEncoder) {
-        this.modelMapper = new ModelMapper();
-
+        this.modelMapper = modelMapper;
         this.customerRepository = customerRepository;
         this.restaurantManagerRepository = restaurantManagerRepository;
         this.delivererRepository = delivererRepository;
-        this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void register(CustomerDTO dto) {
-        register(dto, Customer.class);
+    /**
+     * Returns the user with the given username, or null if it does not exist.
+     */
+    public User getUser(String username) {
+        User user = customerRepository.findById(username).orElse(null);
+
+        if (user == null) {
+            user = restaurantManagerRepository.findById(username).orElse(null);
+        }
+
+        if (user == null) {
+            user = delivererRepository.findById(username).orElse(null);
+        }
+        return user;
     }
 
-    public void register(RestaurantManagerDTO dto) {
-        register(dto, RestaurantManager.class);
-    }
-
-    public void register(DelivererDTO dto) {
-        register(dto, Deliverer.class);
-    }
-
-    private void register(UserDTO dto, Class<? extends User> entityClass) {
-        try {
-            UserDetails user = userDetailsService.loadUserByUsername(dto.getUsername());
-            throw new UsernameExistsException(
-                    "Username " + dto.getUsername() + " is already registered as " + user.getAuthorities());
-        } catch (UsernameNotFoundException e) {
-            // Username does not exist. Continue registration process.
+    public void register(UserDTO dto, Class<? extends User> entityClass) {
+        if (getUser(dto.getUsername()) != null) {
+            throw new UsernameExistsException("Username " + dto.getUsername() + " is already registered");
         }
 
         User user = modelMapper.map(dto, entityClass);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
+        getRepositoryOfEntityClassAndSave(entityClass, user);
+    }
+
+    public void edit(String username, Class<? extends User> entityClass, EditUserDTO newData) {
+        User user = getUser(username);
+        modelMapper.map(newData, user);
+        getRepositoryOfEntityClassAndSave(entityClass, user);
+    }
+
+    public void delete(String username, Class<? extends User> entityClass) {
+        getRepositoryOfEntityClass(entityClass).deleteById(username);
+    }
+
+    private JpaRepository<? extends User, String> getRepositoryOfEntityClass(Class<? extends User> entityClass) {
+        return getRepositoryOfEntityClassAndSave(entityClass, null);
+    }
+
+    /**
+     * Save the user in the appropriate repository if it is not null and return the repository.
+     */
+    private JpaRepository<? extends User, String> getRepositoryOfEntityClassAndSave(Class<? extends User> entityClass,
+                                                                                    User user) {
         if (entityClass == Customer.class) {
-            customerRepository.save((Customer) user);
+            if (user != null) {
+                customerRepository.save((Customer) user);
+            }
+            return customerRepository;
+
         } else if (entityClass == RestaurantManager.class) {
-            restaurantManagerRepository.save((RestaurantManager) user);
+            if (user != null) {
+                restaurantManagerRepository.save((RestaurantManager) user);
+            }
+            return restaurantManagerRepository;
+
         } else {
-            delivererRepository.save((Deliverer) user);
+            if (user != null) {
+                delivererRepository.save((Deliverer) user);
+            }
+            return delivererRepository;
         }
     }
 }

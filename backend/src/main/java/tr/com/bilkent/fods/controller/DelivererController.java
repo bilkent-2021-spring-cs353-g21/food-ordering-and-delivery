@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tr.com.bilkent.fods.dto.rest.CustomHTTPResponse;
-import tr.com.bilkent.fods.dto.user.DelivererDTO;
+import tr.com.bilkent.fods.dto.user.UserDTO;
+import tr.com.bilkent.fods.entity.deliverer.Deliverer;
 import tr.com.bilkent.fods.service.UserService;
 
 import javax.validation.Valid;
@@ -24,9 +25,9 @@ public class DelivererController {
     }
 
     @PostMapping("/register")
-    public CustomHTTPResponse register(@RequestBody @Valid DelivererDTO deliverer) {
-        log.debug("Deliverer register request: {}", deliverer);
-        userService.register(deliverer);
-        return new CustomHTTPResponse("success");
+    public CustomHTTPResponse<Void> register(@RequestBody @Valid UserDTO deliverer) {
+        log.info("Deliverer register request: {}", deliverer);
+        userService.register(deliverer, Deliverer.class);
+        return new CustomHTTPResponse<>("success");
     }
 }
