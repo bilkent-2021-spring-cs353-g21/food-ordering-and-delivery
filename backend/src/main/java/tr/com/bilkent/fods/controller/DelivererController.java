@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/deliverer")
+@RequestMapping("/deliverer")
 public class DelivererController {
     private final UserService userService;
 

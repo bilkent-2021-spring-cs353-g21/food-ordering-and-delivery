@@ -40,9 +40,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests()
                 .antMatchers("/**/register").permitAll()
-                .antMatchers("/api/customer/**").hasRole("CUSTOMER")
-                .antMatchers("/api/deliverer/**").hasRole("DELIVERER")
-                .antMatchers("/api/manager/**").hasRole("RESTAURANT_MANAGER").and()
+                .antMatchers("/customer/**").hasRole("CUSTOMER")
+                .antMatchers("/deliverer/**").hasRole("DELIVERER")
+                .antMatchers("/manager/**").hasRole("RESTAURANT_MANAGER").and()
 
                 .exceptionHandling()
                 .accessDeniedHandler((req, resp, ex) -> resp.setStatus(SC_FORBIDDEN))
@@ -60,6 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("/logout")
                 .permitAll()
+                .clearAuthentication(true)
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
     }
 

@@ -1,9 +1,8 @@
 package tr.com.bilkent.fods.entity.restaurant;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import tr.com.bilkent.fods.entity.district.District;
 import tr.com.bilkent.fods.entity.restaurantmanager.RestaurantManager;
 
@@ -15,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @Entity(name = "restaurant")
 public class Restaurant {
     @Id
@@ -43,5 +43,6 @@ public class Restaurant {
     private List<String> tags;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private RestaurantManager manager;
 }

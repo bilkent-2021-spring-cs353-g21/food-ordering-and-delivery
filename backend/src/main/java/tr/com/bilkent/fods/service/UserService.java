@@ -1,17 +1,18 @@
 package tr.com.bilkent.fods.service;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tr.com.bilkent.fods.dto.user.EditUserDTO;
 import tr.com.bilkent.fods.dto.user.UserDTO;
+import tr.com.bilkent.fods.dto.user.UserWithoutPasswordDTO;
 import tr.com.bilkent.fods.entity.User;
 import tr.com.bilkent.fods.entity.customer.Customer;
 import tr.com.bilkent.fods.entity.deliverer.Deliverer;
 import tr.com.bilkent.fods.entity.restaurantmanager.RestaurantManager;
 import tr.com.bilkent.fods.exception.UsernameExistsException;
+import tr.com.bilkent.fods.mapper.UserMapper;
 import tr.com.bilkent.fods.repository.CustomerRepository;
 import tr.com.bilkent.fods.repository.DelivererRepository;
 import tr.com.bilkent.fods.repository.RestaurantManagerRepository;
@@ -21,26 +22,28 @@ public class UserService {
     private final CustomerRepository customerRepository;
     private final RestaurantManagerRepository restaurantManagerRepository;
     private final DelivererRepository delivererRepository;
-    private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(CustomerRepository customerRepository,
                        RestaurantManagerRepository restaurantManagerRepository,
                        DelivererRepository delivererRepository,
-                       ModelMapper modelMapper,
                        PasswordEncoder passwordEncoder) {
-        this.modelMapper = modelMapper;
         this.customerRepository = customerRepository;
         this.restaurantManagerRepository = restaurantManagerRepository;
         this.delivererRepository = delivererRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    public UserWithoutPasswordDTO getUserWithoutPassword(String username) {
+        User user = getUser(username);
+        return UserMapper.INSTANCE.userWithoutPasswordDTOFromUser(user);
+    }
+
     /**
      * Returns the user with the given username, or null if it does not exist.
      */
-    public User getUser(String username) {
+    protected User getUser(String username) {
         User user = customerRepository.findById(username).orElse(null);
 
         if (user == null) {
@@ -58,7 +61,7 @@ public class UserService {
             throw new UsernameExistsException("Username " + dto.getUsername() + " is already registered");
         }
 
-        User user = modelMapper.map(dto, entityClass);
+        User user = UserMapper.INSTANCE.userFromDto(dto, entityClass);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         getRepositoryOfEntityClassAndSave(entityClass, user);
@@ -66,7 +69,7 @@ public class UserService {
 
     public void edit(String username, Class<? extends User> entityClass, EditUserDTO newData) {
         User user = getUser(username);
-        modelMapper.map(newData, user);
+        UserMapper.INSTANCE.updateUserFromDto(newData, user);
         getRepositoryOfEntityClassAndSave(entityClass, user);
     }
 

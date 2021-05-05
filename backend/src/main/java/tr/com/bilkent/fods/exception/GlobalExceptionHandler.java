@@ -15,10 +15,11 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import tr.com.bilkent.fods.dto.rest.CustomHTTPResponse;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 
-import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static javax.servlet.http.HttpServletResponse.*;
 
 @Slf4j
 @ControllerAdvice
@@ -47,6 +48,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+        log.info("Constraint violation: {}", ex.getMessage());
+        ConstraintViolation<?> violation = ex.getConstraintViolations().iterator().next();
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
+                "Constraint violation: " + violation.getPropertyPath() + " " + violation.getMessage());
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_BAD_REQUEST);
+    }
+
     @ExceptionHandler(UsernameExistsException.class)
     public ResponseEntity<Object> handleUsernameExistsException(UsernameExistsException ex) {
         log.info("Existing username registration request: {}", ex.getMessage());
@@ -58,7 +68,23 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         log.info("Database integrity violation: {}", ex.getMessage());
         CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>("Database integrity violation");
-        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_CONFLICT);
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NonExistsRestaurantException.class)
+    public ResponseEntity<Object> handleNonExistsRestaurantException(NonExistsRestaurantException ex) {
+        log.info("Restaurant does not exist: rid = {}", ex.getRid());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
+                "Restaurant does not exist, or you don't have access to it.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
+    }
+
+    @ExceptionHandler(RestaurantNotManagedException.class)
+    public ResponseEntity<Object> handleRestaurantNotManagedException(RestaurantNotManagedException ex) {
+        log.info("Restaurant is not managed by the signed-in manager: rid = {}", ex.getRid());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
+                "Restaurant does not exist, or you don't have access to it.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
     }
 
     @ExceptionHandler({Exception.class})
