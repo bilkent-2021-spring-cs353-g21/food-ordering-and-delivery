@@ -2,7 +2,7 @@ package tr.com.bilkent.fods.dto.restaurant;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tr.com.bilkent.fods.dto.DistrictDTO;
+import tr.com.bilkent.fods.dto.district.DistrictDTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

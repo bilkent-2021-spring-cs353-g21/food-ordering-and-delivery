@@ -11,11 +11,12 @@ spring:
     url: jdbc:mysql://localhost:3306/cs353
     username: cs353
     password: cs353
-  #    initialization-mode: always
+    initialization-mode: always
 
   jpa:
     hibernate:
       ddl-auto: update
+
 logging:
   file:
     name: fods.log

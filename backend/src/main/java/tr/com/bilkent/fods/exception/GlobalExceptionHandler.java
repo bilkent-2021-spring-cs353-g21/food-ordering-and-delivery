@@ -9,6 +9,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -29,7 +30,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                          HttpHeaders headers,
                                                          HttpStatus status,
                                                          WebRequest request) {
-        logger.warn("Validation failed", ex);
+        log.warn("Validation failed: {}", ex.getBindingResult());
         BindingResult result = ex.getBindingResult();
         CustomHTTPResponse<List<ObjectError>> bodyOfResponse = new CustomHTTPResponse<>(result.getAllErrors(),
                 "Invalid " + result.getObjectName());
@@ -41,11 +42,35 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers,
                                                                   HttpStatus status,
                                                                   WebRequest request) {
-        logger.warn("Method argument invalid", ex);
+        log.warn("Method argument invalid: {}", ex.getBindingResult());
         BindingResult result = ex.getBindingResult();
         CustomHTTPResponse<List<ObjectError>> bodyOfResponse = new CustomHTTPResponse<>(result.getAllErrors(),
                 "Invalid " + result.getObjectName());
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
+                                                                          HttpHeaders headers,
+                                                                          HttpStatus status,
+                                                                          WebRequest request) {
+        log.warn("Missing request parameter: {}", ex.getMessage());
+
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(ex.getMessage());
+        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex,
+                                                             Object body,
+                                                             HttpHeaders headers,
+                                                             HttpStatus status,
+                                                             WebRequest request) {
+        if (body != null) {
+            return super.handleExceptionInternal(ex, body, headers, status, request);
+        }
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(ex.getMessage());
+        return super.handleExceptionInternal(ex, bodyOfResponse, headers, status, request);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -64,6 +89,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_CONFLICT);
     }
 
+    @ExceptionHandler(MealExistsException.class)
+    public ResponseEntity<Object> handleMealExistsException(MealExistsException ex) {
+        log.info("Meal already exists: rid = {} name = {}", ex.getRid(), ex.getName());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>("Meal already exists");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_CONFLICT);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         log.info("Database integrity violation: {}", ex.getMessage());
@@ -77,6 +109,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
                 "Restaurant does not exist, or you don't have access to it.");
         return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
+    }
+
+    @ExceptionHandler(NonExistsCommentException.class)
+    public ResponseEntity<Object> handleNonExistsCommentException(NonExistsCommentException ex) {
+        log.info("Comment does not exist: oid = {}", ex.getOid());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
+                "Comment does not exist, or you don't have access to it.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
+    }
+
+    @ExceptionHandler(CommentAlreadyRepliedException.class)
+    public ResponseEntity<Object> handleCommentAlreadyRepliedException(CommentAlreadyRepliedException ex) {
+        log.info("Comment has been already replied to: oid = {}", ex.getOid());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
+                "Comment already has a response.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_BAD_REQUEST);
     }
 
     @ExceptionHandler(RestaurantNotManagedException.class)

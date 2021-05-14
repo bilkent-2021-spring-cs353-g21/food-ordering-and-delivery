@@ -1,5 +1,6 @@
-package tr.com.bilkent.fods.dto;
+package tr.com.bilkent.fods.dto.district;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,14 +10,10 @@ import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
-public class DistrictDTO {
+@AllArgsConstructor
+public class CityDTO {
     @NotNull
     @NotEmpty
     @Size(max = 20)
     private String cityName;
-
-    @NotNull
-    @NotEmpty
-    @Size(max = 20)
-    private String districtName;
 }

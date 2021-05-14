@@ -68,6 +68,11 @@ public class UserService {
     }
 
     public void edit(String username, Class<? extends User> entityClass, EditUserDTO newData) {
+        String password = newData.getPassword();
+        if (password != null) {
+            newData.setPassword(passwordEncoder.encode(password));
+        }
+
         User user = getUser(username);
         UserMapper.INSTANCE.updateUserFromDto(newData, user);
         getRepositoryOfEntityClassAndSave(entityClass, user);

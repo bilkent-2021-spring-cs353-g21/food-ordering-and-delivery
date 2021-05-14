@@ -28,7 +28,6 @@ public interface UserMapper {
     RestaurantManager managerFromUserDto(UserDTO manager);
 
     @Mapping(target = "username", ignore = true)
-    @Mapping(target = "password", ignore = true)
     @Mapping(target = "email", ignore = true)
     void updateUserFromDto(EditUserDTO userDto, @MappingTarget User user);
 

@@ -1,4 +1,4 @@
-package tr.com.bilkent.fods.delivererassignment;
+package tr.com.bilkent.fods.entity.delivererassignment;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

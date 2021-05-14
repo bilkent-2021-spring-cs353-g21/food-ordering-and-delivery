@@ -9,6 +9,11 @@ import tr.com.bilkent.fods.entity.ordercontent.OrderContentKey;
 import java.util.List;
 
 public interface OrderContentRepository extends JpaRepository<OrderContent, OrderContentKey> {
-    @Query(value = "SELECT * FROM order_content WHERE oid = ?1", nativeQuery = true)
+    String SQL_SELECT_CONTENTS_OF_ORDER = "SELECT * FROM order_content WHERE oid = ?1";
+
+    @Query(value = SQL_SELECT_CONTENTS_OF_ORDER, nativeQuery = true)
     List<OrderContent> getContentsOfOrder(Order order);
+
+    @Query(value = SQL_SELECT_CONTENTS_OF_ORDER, nativeQuery = true)
+    List<OrderContent> getContentsOfOrder(long oid);
 }

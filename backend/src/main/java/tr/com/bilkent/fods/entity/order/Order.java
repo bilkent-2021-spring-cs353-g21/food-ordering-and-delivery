@@ -32,4 +32,6 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "from_restaurant")
     private Restaurant fromRestaurant;
+
+    private Double cost;
 }

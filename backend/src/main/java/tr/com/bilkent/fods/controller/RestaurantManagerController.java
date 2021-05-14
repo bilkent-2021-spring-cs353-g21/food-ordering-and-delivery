@@ -2,12 +2,18 @@ package tr.com.bilkent.fods.controller;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+import tr.com.bilkent.fods.dto.comment.CommentListDTO;
+import tr.com.bilkent.fods.dto.district.CityDTO;
+import tr.com.bilkent.fods.dto.district.DistrictDTO;
+import tr.com.bilkent.fods.dto.meal.MealDTO;
+import tr.com.bilkent.fods.dto.order.OrderListDTO;
 import tr.com.bilkent.fods.dto.rest.CustomHTTPResponse;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantDTO;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantNameDTO;
@@ -15,24 +21,31 @@ import tr.com.bilkent.fods.dto.user.EditUserDTO;
 import tr.com.bilkent.fods.dto.user.UserDTO;
 import tr.com.bilkent.fods.dto.user.UserWithoutPasswordDTO;
 import tr.com.bilkent.fods.entity.restaurantmanager.RestaurantManager;
+import tr.com.bilkent.fods.service.DistrictService;
 import tr.com.bilkent.fods.service.RestaurantService;
 import tr.com.bilkent.fods.service.UserService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
+@Validated
 @RequestMapping("/manager")
 public class RestaurantManagerController {
     private final UserService userService;
     private final RestaurantService restaurantService;
+    private final DistrictService districtService;
 
     @Autowired
     public RestaurantManagerController(UserService userService,
-                                       RestaurantService restaurantService) {
+                                       RestaurantService restaurantService,
+                                       DistrictService districtService) {
         this.userService = userService;
         this.restaurantService = restaurantService;
+        this.districtService = districtService;
     }
 
     @PostMapping("/register")
@@ -132,5 +145,81 @@ public class RestaurantManagerController {
         String username = authentication.getName();
         restaurantService.deleteRestaurant(rid, username);
         return new CustomHTTPResponse<>("Restaurant deleted.");
+    }
+
+    @ApiOperation("Get cities.")
+    @GetMapping("/cities")
+    public CustomHTTPResponse<Set<CityDTO>> getCities() {
+        log.info("Get cities request");
+        return new CustomHTTPResponse<>(districtService.getCities());
+    }
+
+    @ApiOperation("Get districts of the city.")
+    @GetMapping("/districts/{cityName}")
+    public CustomHTTPResponse<List<DistrictDTO>> getDistricts(@PathVariable("cityName") String cityName) {
+        log.info("Get districts of city request: {}", cityName);
+        return new CustomHTTPResponse<>(districtService.getDistrictsOfCity(cityName));
+    }
+
+    @ApiOperation("Get orders of restaurant sorted by the placed date.")
+    @GetMapping("/restaurant/{rid}/orders")
+    public CustomHTTPResponse<OrderListDTO> getOrdersOfRestaurant(@PathVariable("rid") long rid,
+                                                                  @RequestParam(value = "page", defaultValue = "0")
+                                                                  @Min(0) int page,
+                                                                  @RequestParam(value = "limit", defaultValue = "25")
+                                                                  @Min(1) int limit,
+                                                                  @ApiIgnore Authentication authentication) {
+        log.info("Get orders request: rid = {} page = {} limit = {}", rid, page, limit);
+
+        String username = authentication.getName();
+        return new CustomHTTPResponse<>(restaurantService.getOrders(rid, username, page, limit));
+    }
+
+    @ApiOperation("Get comments of restaurant sorted by the placed date.")
+    @GetMapping("/restaurant/{rid}/comments")
+    public CustomHTTPResponse<CommentListDTO> getCommentsOfRestaurant(@PathVariable("rid") long rid,
+                                                                      @RequestParam(value = "page", defaultValue = "0")
+                                                                      @Min(0) int page,
+                                                                      @RequestParam(value = "limit", defaultValue = "25")
+                                                                      @Min(1) int limit,
+                                                                      @ApiIgnore Authentication authentication) {
+        log.info("Get comments request: rid = {} page = {} limit = {}", rid, page, limit);
+
+        String username = authentication.getName();
+        return new CustomHTTPResponse<>(restaurantService.getComments(rid, username, page, limit));
+    }
+
+    @ApiOperation("Reply to a comment.")
+    @PutMapping("/reply_to_comment/{oid}")
+    public CustomHTTPResponse<Void> replyToComment(@PathVariable("oid") long oid,
+                                                   @RequestBody @Length(min = 1) String response,
+                                                   @ApiIgnore Authentication authentication) {
+        log.info("Reply to a comment request: oid = {} response = {}", oid, response);
+
+        String username = authentication.getName();
+        restaurantService.replyToComment(username, oid, response);
+        return new CustomHTTPResponse<>("Reply successful.");
+    }
+
+    @ApiOperation("Get meals of the restaurant sorted by type.")
+    @GetMapping("/restaurant/{rid}/meals")
+    public CustomHTTPResponse<List<MealDTO>> getMeals(@PathVariable("rid") long rid,
+                                                      @ApiIgnore Authentication authentication) {
+        log.info("Get meals request: rid = {}", rid);
+
+        String username = authentication.getName();
+        return new CustomHTTPResponse<>(restaurantService.getMeals(rid, username));
+    }
+
+    @ApiOperation("Create a meal in the restaurant.")
+    @PutMapping("/restaurant/{rid}/meals")
+    public CustomHTTPResponse<CommentListDTO> createMeal(@PathVariable("rid") long rid,
+                                                         @RequestBody @Valid MealDTO meal,
+                                                         @ApiIgnore Authentication authentication) {
+        log.info("Create meal request: rid = {} meal = {}", rid, meal);
+
+        String username = authentication.getName();
+        restaurantService.createMeal(rid, username, meal);
+        return new CustomHTTPResponse<>("Meal successfully added to the system.");
     }
 }

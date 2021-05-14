@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @Entity(name = "order_content")
 public class OrderContent {
-    @Id
+    @EmbeddedId
     private OrderContentKey orderContentKey;
 
     @ManyToOne
@@ -26,11 +26,13 @@ public class OrderContent {
 
     @ManyToOne
     @MapsId("mealKey")
-    @JoinColumn(name = "rid")
-    @JoinColumn(name = "name")
+    @JoinColumn(name = "rid", referencedColumnName = "rid")
+    @JoinColumn(name = "name", referencedColumnName = "name")
     private Meal meal;
 
     private int quantity;
+
+    private double mealPrice;
 
     @ElementCollection
     @CollectionTable(name = "order_content_ingredients",

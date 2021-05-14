@@ -9,6 +9,6 @@ import tr.com.bilkent.fods.entity.restaurant.Restaurant;
 import java.util.List;
 
 public interface MealRepository extends JpaRepository<Meal, MealKey> {
-    @Query(value = "SELECT * FROM meal WHERE rid = ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM meal WHERE rid = ?1 ORDER BY type", nativeQuery = true)
     List<Meal> getMenu(Restaurant restaurant);
 }
