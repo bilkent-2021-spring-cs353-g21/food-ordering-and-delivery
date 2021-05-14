@@ -42,7 +42,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/**/register").permitAll()
                 .antMatchers("/customer/**").hasRole("CUSTOMER")
                 .antMatchers("/deliverer/**").hasRole("DELIVERER")
-                .antMatchers("/manager/**").hasRole("RESTAURANT_MANAGER").and()
+                .antMatchers("/manager/**").hasRole("RESTAURANT_MANAGER")
+                .anyRequest().permitAll().and()
 
                 .exceptionHandling()
                 .accessDeniedHandler((req, resp, ex) -> resp.setStatus(SC_FORBIDDEN))

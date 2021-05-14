@@ -5,89 +5,31 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 import tr.com.bilkent.fods.dto.comment.CommentListDTO;
-import tr.com.bilkent.fods.dto.district.CityDTO;
-import tr.com.bilkent.fods.dto.district.DistrictDTO;
 import tr.com.bilkent.fods.dto.meal.MealDTO;
 import tr.com.bilkent.fods.dto.order.OrderListDTO;
 import tr.com.bilkent.fods.dto.rest.CustomHTTPResponse;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantDTO;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantNameDTO;
-import tr.com.bilkent.fods.dto.user.EditUserDTO;
-import tr.com.bilkent.fods.dto.user.UserDTO;
-import tr.com.bilkent.fods.dto.user.UserWithoutPasswordDTO;
-import tr.com.bilkent.fods.entity.restaurantmanager.RestaurantManager;
-import tr.com.bilkent.fods.service.DistrictService;
 import tr.com.bilkent.fods.service.RestaurantService;
-import tr.com.bilkent.fods.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @RestController
 @Validated
 @RequestMapping("/manager")
 public class RestaurantManagerController {
-    private final UserService userService;
     private final RestaurantService restaurantService;
-    private final DistrictService districtService;
 
     @Autowired
-    public RestaurantManagerController(UserService userService,
-                                       RestaurantService restaurantService,
-                                       DistrictService districtService) {
-        this.userService = userService;
+    public RestaurantManagerController(RestaurantService restaurantService) {
         this.restaurantService = restaurantService;
-        this.districtService = districtService;
-    }
-
-    @PostMapping("/register")
-    public CustomHTTPResponse<Void> register(@RequestBody @Valid UserDTO manager) {
-        log.info("Restaurant manager register request: {}", manager);
-        userService.register(manager, RestaurantManager.class);
-        return new CustomHTTPResponse<>("Registration successful.");
-    }
-
-    @ApiOperation("Get the account details of the logged-in manager.")
-    @GetMapping("/account")
-    public CustomHTTPResponse<UserWithoutPasswordDTO> getAccount(@ApiIgnore Authentication authentication) {
-        log.info("Restaurant manager get account details request");
-
-        String username = authentication.getName();
-        UserWithoutPasswordDTO user = userService.getUserWithoutPassword(username);
-
-        return new CustomHTTPResponse<>(user);
-    }
-
-    @ApiOperation("Edit the account of the logged-in manager.")
-    @PatchMapping("/account")
-    public CustomHTTPResponse<Void> editAccount(@RequestBody @Valid EditUserDTO user,
-                                                @ApiIgnore Authentication authentication) {
-        log.info("Restaurant manager edit account request");
-
-        String username = authentication.getName();
-        userService.edit(username, RestaurantManager.class, user);
-
-        return new CustomHTTPResponse<>("Account successfully modified.");
-    }
-
-    @ApiOperation("Delete the account of the logged-in manager. NOTE: The managed restaurants are deleted as well.")
-    @DeleteMapping("/account")
-    public CustomHTTPResponse<Void> deleteAccount(@ApiIgnore Authentication authentication) {
-        log.info("Restaurant manager delete account request");
-
-        String username = authentication.getName();
-        userService.delete(username, RestaurantManager.class);
-
-        SecurityContextHolder.clearContext();
-        return new CustomHTTPResponse<>("Account deleted.");
     }
 
     @ApiOperation("Retrieve the names and IDs of the restaurant managed by the logged-in user.")
@@ -145,20 +87,6 @@ public class RestaurantManagerController {
         String username = authentication.getName();
         restaurantService.deleteRestaurant(rid, username);
         return new CustomHTTPResponse<>("Restaurant deleted.");
-    }
-
-    @ApiOperation("Get cities.")
-    @GetMapping("/cities")
-    public CustomHTTPResponse<Set<CityDTO>> getCities() {
-        log.info("Get cities request");
-        return new CustomHTTPResponse<>(districtService.getCities());
-    }
-
-    @ApiOperation("Get districts of the city.")
-    @GetMapping("/districts/{cityName}")
-    public CustomHTTPResponse<List<DistrictDTO>> getDistricts(@PathVariable("cityName") String cityName) {
-        log.info("Get districts of city request: {}", cityName);
-        return new CustomHTTPResponse<>(districtService.getDistrictsOfCity(cityName));
     }
 
     @ApiOperation("Get orders of restaurant sorted by the placed date.")

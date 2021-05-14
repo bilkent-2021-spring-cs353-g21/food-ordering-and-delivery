@@ -8,9 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import tr.com.bilkent.fods.controller.enums.UserType;
 import tr.com.bilkent.fods.entity.User;
-import tr.com.bilkent.fods.entity.customer.Customer;
-import tr.com.bilkent.fods.entity.restaurantmanager.RestaurantManager;
 
 import java.util.Collections;
 
@@ -28,16 +27,11 @@ public class MyUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("No user found with username: " + username);
         }
 
-        String role;
-        if (user instanceof Customer) {
-            role = "ROLE_CUSTOMER";
-        } else if (user instanceof RestaurantManager) {
-            role = "ROLE_RESTAURANT_MANAGER";
-        } else {
-            role = "ROLE_DELIVERER";
-        }
+        UserType userType = UserType.get(user.getClass());
+        assert userType != null;
+        String role = userType.getRole();
 
-        log.info("{} log-in attempt. Username: {}", role, username);
+        log.info("{} user loaded. Username: {}", role, username);
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), true,
                 true, true, true, Collections.singleton(new SimpleGrantedAuthority(role)));
     }
