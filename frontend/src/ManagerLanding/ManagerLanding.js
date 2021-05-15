@@ -16,7 +16,12 @@ import Button from "@material-ui/core/Button";
 import SideMenu from "./SideMenu";
 import { Link } from "react-router-dom";
 
+import Profile from "../Management/ProfileSettings/Profile";
+import AddRestaurant from "../Management/AddRestaurant/AddRestaurant";
 import { setLocalStorage, getLocalStorage } from "../Service/localStorage";
+import RestaurantSettings from "../Management/RestaurantSettings/RestaurantSettings";
+import { Orders } from "../Management/Orders/Orders";
+import { MenuSettings } from "../Management/MenuSettings/MenuSettings";
 
 const drawerWidth = 220;
 
@@ -26,6 +31,11 @@ class ManagerLanding extends React.Component {
         this.state = {
             open: false,
             anchorEl: null,
+            pageSelection: 0,
+        };
+
+        this.callbackFunction = (childData) => {
+            this.setState({ pageSelection: childData });
         };
 
         this.handleDrawerOpen = () => {
@@ -41,6 +51,21 @@ class ManagerLanding extends React.Component {
         };
         this.handleClose = () => {
             this.setState({ anchorEl: null });
+        };
+
+        this.renderSwitch = (pageNo) => {
+            switch (pageNo) {
+                case 1:
+                    return <Profile></Profile>;
+                case 2:
+                    return <AddRestaurant></AddRestaurant>;
+                case 3:
+                    return <RestaurantSettings></RestaurantSettings>;
+                case 4:
+                    return <Orders></Orders>;
+                case 6:
+                    return <MenuSettings></MenuSettings>;
+            }
         };
     }
 
@@ -86,7 +111,7 @@ class ManagerLanding extends React.Component {
                             className={classes.title}
                             noWrap
                         >
-                            ORDER.COM
+                            {this.state.pageSelection}
                         </Typography>
                         <div>
                             <Button
@@ -122,10 +147,10 @@ class ManagerLanding extends React.Component {
                     }}
                     open={this.state.open}
                 >
-                    <SideMenu></SideMenu>
+                    <SideMenu parentCallback={this.callbackFunction}></SideMenu>
                 </Drawer>
                 <main className={classes.content}>
-                    <div className={classes.toolbar} />
+                    {this.renderSwitch(this.state.pageSelection)}
                 </main>
             </div>
         );

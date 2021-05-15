@@ -26,8 +26,8 @@ const FormSignin = ({ submitForm }) => {
     const isSignedIn = getLocalStorage("isSignedIn");
     const history = useHistory();
     if (isSignedIn) {
-        history.replace("/managerLanding");
-        window.location.href = "/managerLanding";
+        history.replace("/manager");
+        window.location.href = "/manager";
     }
 
     const { handleSubmit, values, errors } = useForm(submitForm, validate);
