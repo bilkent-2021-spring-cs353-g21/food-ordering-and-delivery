@@ -2,6 +2,7 @@ package tr.com.bilkent.fods.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -119,6 +120,37 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
     }
 
+    @ExceptionHandler(NonExistsMealException.class)
+    public ResponseEntity<Object> handleNonExistsMealException(NonExistsMealException ex) {
+        log.info("Meal does not exist: mealName = {} rid = {}", ex.getMealName(), ex.getRid());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
+                "Meal does not exist, or you don't have access to it.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
+    }
+
+    @ExceptionHandler(NonExistsOrderException.class)
+    public ResponseEntity<Object> handleNonExistsOrderException(NonExistsOrderException ex) {
+        log.info("Order does not exist: oid = {}", ex.getOid());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
+                "Order does not exist, or you don't have access to it.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
+    }
+
+    @ExceptionHandler(OrderNotFromRestaurantException.class)
+    public ResponseEntity<Object> handleOrderNotFromRestaurantException(OrderNotFromRestaurantException ex) {
+        log.info("Order restaurant mismatch: oid = {} rid = {}", ex.getOid(), ex.getRid());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
+                "Order does not exist, or you don't have access to it.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
+    }
+
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex) {
+        log.info("Empty result set: {}", ex.getMessage());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>("No such entity found");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
+    }
+
     @ExceptionHandler(CommentAlreadyRepliedException.class)
     public ResponseEntity<Object> handleCommentAlreadyRepliedException(CommentAlreadyRepliedException ex) {
         log.info("Comment has been already replied to: oid = {}", ex.getOid());
@@ -133,6 +165,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
                 "Restaurant does not exist, or you don't have access to it.");
         return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidOrderStatusException.class)
+    public ResponseEntity<Object> handleInvalidOrderStatusException(InvalidOrderStatusException ex) {
+        log.info("Invalid order status: {}", ex.toString());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
+                "Invalid order status: Expected " + ex.getExpected() + ", but found " + ex.getActual());
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BasketContentMultipleRestaurantsException.class)
+    public ResponseEntity<Object> handleBasketContentMultipleRestaurantsException(BasketContentMultipleRestaurantsException ex) {
+        String msg = "Basket content cannot contain meals from different restaurants";
+        log.info(msg);
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(msg);
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_BAD_REQUEST);
     }
 
     @ExceptionHandler({Exception.class})

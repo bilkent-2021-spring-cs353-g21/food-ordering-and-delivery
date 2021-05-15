@@ -10,26 +10,31 @@ import tr.com.bilkent.fods.dto.user.UserWithoutPasswordDTO;
 import tr.com.bilkent.fods.entity.User;
 import tr.com.bilkent.fods.entity.customer.Customer;
 import tr.com.bilkent.fods.entity.deliverer.Deliverer;
+import tr.com.bilkent.fods.entity.order.Order;
 import tr.com.bilkent.fods.entity.restaurantmanager.RestaurantManager;
 import tr.com.bilkent.fods.exception.UsernameExistsException;
 import tr.com.bilkent.fods.mapper.UserMapper;
 import tr.com.bilkent.fods.repository.CustomerRepository;
 import tr.com.bilkent.fods.repository.DelivererRepository;
+import tr.com.bilkent.fods.repository.OrderRepository;
 import tr.com.bilkent.fods.repository.RestaurantManagerRepository;
 
 @Service
 public class UserService {
     private final CustomerRepository customerRepository;
+    private final OrderRepository orderRepository;
     private final RestaurantManagerRepository restaurantManagerRepository;
     private final DelivererRepository delivererRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(CustomerRepository customerRepository,
+                       OrderRepository orderRepository,
                        RestaurantManagerRepository restaurantManagerRepository,
                        DelivererRepository delivererRepository,
                        PasswordEncoder passwordEncoder) {
         this.customerRepository = customerRepository;
+        this.orderRepository = orderRepository;
         this.restaurantManagerRepository = restaurantManagerRepository;
         this.delivererRepository = delivererRepository;
         this.passwordEncoder = passwordEncoder;
@@ -65,6 +70,9 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         getRepositoryOfEntityClassAndSave(entityClass, user);
+        if (Customer.class.equals(entityClass)) {
+            setupCustomerAccount((Customer) user);
+        }
     }
 
     public void edit(String username, Class<? extends User> entityClass, EditUserDTO newData) {
@@ -109,5 +117,11 @@ public class UserService {
             }
             return delivererRepository;
         }
+    }
+
+    private void setupCustomerAccount(Customer customer) {
+        Order order = new Order();
+        order.setBelongsTo(customer);
+        orderRepository.save(order);
     }
 }

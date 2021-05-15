@@ -37,6 +37,6 @@ public class DelivererAssignment {
     @Column(name = "deliver_time")
     private Timestamp deliverTime;
 
-    @Column(name = "rejection_reason")
-    private String rejectionReason;
+    @Column(name = "is_rejected")
+    private Boolean isRejected;
 }

@@ -9,6 +9,7 @@ import lombok.Getter;
 public enum OrderStatus {
     WAITING("WAITING"),
     COOKING("COOKING"),
+    WAITING_FOR_DELIVERER("WAITING_FOR_DELIVERER"),
     DELIVERING("DELIVERING"),
     COMPLETED("COMPLETED"),
     CANCELED("CANCELED");

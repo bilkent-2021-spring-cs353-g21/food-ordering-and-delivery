@@ -1,13 +1,13 @@
 package tr.com.bilkent.fods.mapper;
 
-import org.mapstruct.InheritInverseConfiguration;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import tr.com.bilkent.fods.config.MapperConfig;
+import tr.com.bilkent.fods.dto.meal.AddToBasketDTO;
 import tr.com.bilkent.fods.dto.meal.MealDTO;
 import tr.com.bilkent.fods.dto.search.MealResultDTO;
 import tr.com.bilkent.fods.entity.meal.Meal;
+import tr.com.bilkent.fods.entity.ordercontent.OrderContent;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public interface MealMapper {
     @Mapping(target = "mealKey", source = ".")
     Meal mealDtoToMeal(MealDTO meal);
 
-    @InheritInverseConfiguration
+    @InheritInverseConfiguration(name = "mealDtoToMeal")
     MealDTO mealToMealDto(Meal meal);
 
     List<MealDTO> mealsToMealDtos(List<Meal> meals);
@@ -30,4 +30,14 @@ public interface MealMapper {
     MealResultDTO mealsToMealResult(Meal meal);
 
     List<MealResultDTO> mealsToMealResult(List<Meal> meals);
+
+    @InheritConfiguration(name = "mealDtoToMeal")
+    void updateMealFromDto(MealDTO mealDto, @MappingTarget Meal meal);
+
+    @Mapping(target = "orderContentKey", source = ".")
+    @Mapping(target = "orderContentKey.mealKey", source = ".")
+    @Mapping(target = "mealPrice", ignore = true)
+    @Mapping(target = "meal", ignore = true)
+    @Mapping(target = "order", ignore = true)
+    OrderContent addToBasketDtoToOrderContent(AddToBasketDTO meal);
 }

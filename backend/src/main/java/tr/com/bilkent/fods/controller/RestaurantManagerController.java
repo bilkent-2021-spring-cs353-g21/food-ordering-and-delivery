@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 import tr.com.bilkent.fods.dto.comment.CommentListDTO;
 import tr.com.bilkent.fods.dto.meal.MealDTO;
+import tr.com.bilkent.fods.dto.meal.MealNameDTO;
 import tr.com.bilkent.fods.dto.order.OrderListDTO;
 import tr.com.bilkent.fods.dto.rest.CustomHTTPResponse;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantDTO;
@@ -129,25 +130,51 @@ public class RestaurantManagerController {
         return new CustomHTTPResponse<>("Reply successful.");
     }
 
-    @ApiOperation("Get meals of the restaurant sorted by type.")
-    @GetMapping("/restaurant/{rid}/meals")
-    public CustomHTTPResponse<List<MealDTO>> getMeals(@PathVariable("rid") long rid,
-                                                      @ApiIgnore Authentication authentication) {
-        log.info("Get meals request: rid = {}", rid);
-
-        String username = authentication.getName();
-        return new CustomHTTPResponse<>(restaurantService.getMeals(rid, username));
-    }
-
     @ApiOperation("Create a meal in the restaurant.")
     @PutMapping("/restaurant/{rid}/meals")
-    public CustomHTTPResponse<CommentListDTO> createMeal(@PathVariable("rid") long rid,
-                                                         @RequestBody @Valid MealDTO meal,
-                                                         @ApiIgnore Authentication authentication) {
+    public CustomHTTPResponse<Void> createMeal(@PathVariable("rid") long rid,
+                                               @RequestBody @Valid MealDTO meal,
+                                               @ApiIgnore Authentication authentication) {
         log.info("Create meal request: rid = {} meal = {}", rid, meal);
 
         String username = authentication.getName();
         restaurantService.createMeal(rid, username, meal);
         return new CustomHTTPResponse<>("Meal successfully added to the system.");
+    }
+
+    @ApiOperation("Edit a meal in the restaurant.")
+    @PatchMapping("/restaurant/{rid}/meals")
+    public CustomHTTPResponse<Void> editMeal(@PathVariable("rid") long rid,
+                                             @RequestBody @Valid MealDTO meal,
+                                             @ApiIgnore Authentication authentication) {
+        log.info("Edit meal request: rid = {} meal = {}", rid, meal);
+
+        String username = authentication.getName();
+        restaurantService.editMeal(rid, username, meal);
+        return new CustomHTTPResponse<>("Meal successfully deleted from the system.");
+    }
+
+    @ApiOperation("Delete a meal in the restaurant.")
+    @DeleteMapping("/restaurant/{rid}/meals")
+    public CustomHTTPResponse<Void> deleteMeal(@PathVariable("rid") long rid,
+                                               @RequestBody @Valid MealNameDTO meal,
+                                               @ApiIgnore Authentication authentication) {
+        log.info("Delete meal request: rid = {} meal = {}", rid, meal);
+
+        String username = authentication.getName();
+        restaurantService.deleteMeal(rid, username, meal);
+        return new CustomHTTPResponse<>("Meal successfully deleted from the system.");
+    }
+
+    @ApiOperation("Ask for a delivery guy assignment on the given order.")
+    @PostMapping("/restaurant/{rid}/orders/{oid}/request_delivery")
+    public CustomHTTPResponse<Void> requestDelivery(@PathVariable("rid") long rid,
+                                                    @PathVariable("oid") long oid,
+                                                    @ApiIgnore Authentication authentication) {
+        log.info("Request delivery request: rid = {} oid = {}", rid, oid);
+
+        String username = authentication.getName();
+        restaurantService.requestDelivery(rid, username, oid);
+        return new CustomHTTPResponse<>("Delivery requested");
     }
 }

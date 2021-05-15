@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import tr.com.bilkent.fods.dto.comment.CommentDTO;
 import tr.com.bilkent.fods.dto.comment.CommentListDTO;
 import tr.com.bilkent.fods.dto.meal.MealDTO;
+import tr.com.bilkent.fods.dto.meal.MealNameDTO;
 import tr.com.bilkent.fods.dto.order.OrderDTO;
 import tr.com.bilkent.fods.dto.order.OrderListDTO;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantDTO;
@@ -16,6 +17,7 @@ import tr.com.bilkent.fods.entity.comment.Comment;
 import tr.com.bilkent.fods.entity.meal.Meal;
 import tr.com.bilkent.fods.entity.meal.MealKey;
 import tr.com.bilkent.fods.entity.order.Order;
+import tr.com.bilkent.fods.entity.order.OrderStatus;
 import tr.com.bilkent.fods.entity.ordercontent.OrderContent;
 import tr.com.bilkent.fods.entity.restaurant.Restaurant;
 import tr.com.bilkent.fods.entity.restaurantmanager.RestaurantManager;
@@ -154,6 +156,37 @@ public class RestaurantService {
         meal.setRestaurant(restaurant);
 
         mealRepository.save(meal);
+    }
+
+    public void editMeal(long rid, String username, MealDTO newData) {
+        getManagedRestaurant(rid, username);
+        Meal meal = mealRepository.findById(new MealKey(rid, newData.getName())).orElseThrow(
+                () -> new NonExistsMealException(rid, newData.getName()));
+
+        MealMapper.INSTANCE.updateMealFromDto(newData, meal);
+        mealRepository.save(meal);
+    }
+
+    public void deleteMeal(long rid, String username, MealNameDTO meal) {
+        getManagedRestaurant(rid, username);
+        MealKey mealKey = new MealKey(rid, meal.getName());
+        mealRepository.deleteById(mealKey);
+    }
+
+    public void requestDelivery(long rid, String username, long oid) {
+        getManagedRestaurant(rid, username);
+        Order order = orderRepository.findById(oid).orElseThrow(
+                () -> new NonExistsOrderException(oid));
+
+        if (order.getFromRestaurant().getRid() != rid) {
+            throw new OrderNotFromRestaurantException(oid, rid);
+        }
+        if (order.getStatus() != OrderStatus.COOKING) {
+            throw new InvalidOrderStatusException(oid, order.getStatus(), OrderStatus.COOKING);
+        }
+
+        order.setStatus(OrderStatus.WAITING_FOR_DELIVERER);
+        orderRepository.save(order);
     }
 
     private Restaurant getManagedRestaurant(long rid, String username) {

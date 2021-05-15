@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 import tr.com.bilkent.fods.entity.meal.Meal;
 import tr.com.bilkent.fods.entity.order.Order;
 
@@ -26,8 +27,10 @@ public class OrderContent {
 
     @ManyToOne
     @MapsId("mealKey")
-    @JoinColumn(name = "rid", referencedColumnName = "rid")
-    @JoinColumn(name = "name", referencedColumnName = "name")
+    @JoinColumns(value = {
+            @JoinColumn(name = "rid", referencedColumnName = "rid"),
+            @JoinColumn(name = "name", referencedColumnName = "name")
+    }, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Meal meal;
 
     private int quantity;
@@ -35,6 +38,7 @@ public class OrderContent {
     private double mealPrice;
 
     @ElementCollection
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @CollectionTable(name = "order_content_ingredients",
             joinColumns = {
                     @JoinColumn(name = "oid", referencedColumnName = "oid"),
