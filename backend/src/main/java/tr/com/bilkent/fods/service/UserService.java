@@ -37,7 +37,7 @@ public class UserService {
 
     public UserWithoutPasswordDTO getUserWithoutPassword(String username) {
         User user = getUser(username);
-        return UserMapper.INSTANCE.userWithoutPasswordDTOFromUser(user);
+        return UserMapper.INSTANCE.userToUserWithoutPasswordDto(user);
     }
 
     /**
@@ -61,7 +61,7 @@ public class UserService {
             throw new UsernameExistsException("Username " + dto.getUsername() + " is already registered");
         }
 
-        User user = UserMapper.INSTANCE.userFromDto(dto, entityClass);
+        User user = UserMapper.INSTANCE.userDtoToUser(dto, entityClass);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         getRepositoryOfEntityClassAndSave(entityClass, user);

@@ -12,5 +12,5 @@ import java.util.List;
 public interface CommentMapper {
     CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
 
-    List<CommentDTO> commentDtosFromComment(List<Comment> comments);
+    List<CommentDTO> commentsToCommentDtos(List<Comment> comments);
 }

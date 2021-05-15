@@ -8,6 +8,7 @@ import org.mapstruct.factory.Mappers;
 import tr.com.bilkent.fods.config.MapperConfig;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantDTO;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantNameDTO;
+import tr.com.bilkent.fods.dto.search.RestaurantResultDTO;
 import tr.com.bilkent.fods.entity.restaurant.Restaurant;
 
 import java.util.List;
@@ -27,4 +28,6 @@ public interface RestaurantMapper {
 
     @Mapping(target = "manager", ignore = true)
     void updateRestaurantFromDto(RestaurantDTO restaurantDto, @MappingTarget Restaurant restaurant);
+
+    List<RestaurantResultDTO> restaurantsToRestaurantResultDtos(List<Restaurant> restaurants);
 }

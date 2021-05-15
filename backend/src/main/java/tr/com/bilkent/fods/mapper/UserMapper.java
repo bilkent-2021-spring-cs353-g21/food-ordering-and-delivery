@@ -19,28 +19,28 @@ public interface UserMapper {
 
     @Mapping(target = "score", ignore = true)
     @Mapping(target = "credit", ignore = true)
-    Customer customerFromUserDto(UserDTO customer);
+    Customer userDtoToCustomer(UserDTO customer);
 
     @Mapping(target = "worksWith", ignore = true)
     @Mapping(target = "status", ignore = true)
-    Deliverer delivererFromUserDto(UserDTO deliverer);
+    Deliverer userDtoToDeliverer(UserDTO deliverer);
 
-    RestaurantManager managerFromUserDto(UserDTO manager);
+    RestaurantManager userDtoToManager(UserDTO manager);
 
     @Mapping(target = "username", ignore = true)
     @Mapping(target = "email", ignore = true)
     void updateUserFromDto(EditUserDTO userDto, @MappingTarget User user);
 
     @Mapping(target = "phoneNumber", ignore = true)
-    UserWithoutPasswordDTO userWithoutPasswordDTOFromUser(User user);
+    UserWithoutPasswordDTO userToUserWithoutPasswordDto(User user);
 
-    default User userFromDto(UserDTO dto, Class<? extends User> entityClass) {
+    default User userDtoToUser(UserDTO dto, Class<? extends User> entityClass) {
         if (entityClass == Customer.class) {
-            return customerFromUserDto(dto);
+            return userDtoToCustomer(dto);
         } else if (entityClass == Deliverer.class) {
-            return delivererFromUserDto(dto);
+            return userDtoToDeliverer(dto);
         } else {
-            return managerFromUserDto(dto);
+            return userDtoToManager(dto);
         }
     }
 }

@@ -102,10 +102,10 @@ public class RestaurantService {
         Restaurant restaurant = getManagedRestaurant(rid, username);
         Page<Order> orders = orderRepository.getOrdersOfRestaurant(restaurant, PageRequest.of(pageNo, limit));
 
-        List<OrderDTO> orderDtos = OrderMapper.INSTANCE.orderDtosFromOrders(orders.getContent());
+        List<OrderDTO> orderDtos = OrderMapper.INSTANCE.ordersToOrderDtos(orders.getContent());
         orderDtos.forEach(orderDto -> {
             List<OrderContent> orderContents = orderContentRepository.getContentsOfOrder(orderDto.getOid());
-            orderDto.setContent(OrderMapper.INSTANCE.orderContentDtosFromOrderContents(orderContents));
+            orderDto.setContent(OrderMapper.INSTANCE.orderContentsToOrderContentDtos(orderContents));
         });
 
         return new OrderListDTO(orders.getTotalElements(), orders.getTotalPages(), orderDtos);
@@ -115,7 +115,7 @@ public class RestaurantService {
         Restaurant restaurant = getManagedRestaurant(rid, username);
         Page<Comment> comments = commentRepository.getCommentsOfRestaurant(restaurant, PageRequest.of(page, limit));
 
-        List<CommentDTO> commentDtos = CommentMapper.INSTANCE.commentDtosFromComment(comments.getContent());
+        List<CommentDTO> commentDtos = CommentMapper.INSTANCE.commentsToCommentDtos(comments.getContent());
         return new CommentListDTO(comments.getTotalElements(), comments.getTotalPages(), commentDtos);
     }
 
@@ -138,7 +138,7 @@ public class RestaurantService {
     public List<MealDTO> getMeals(long rid, String username) {
         Restaurant restaurant = getManagedRestaurant(rid, username);
         List<Meal> meals = mealRepository.getMenu(restaurant);
-        return MealMapper.INSTANCE.mealDtosFromMeals(meals);
+        return MealMapper.INSTANCE.mealsToMealDtos(meals);
     }
 
     public void createMeal(long rid, String username, MealDTO mealDto) {
@@ -149,7 +149,7 @@ public class RestaurantService {
             throw new MealExistsException(rid, mealDto.getName());
         });
 
-        Meal meal = MealMapper.INSTANCE.mealFromDto(mealDto);
+        Meal meal = MealMapper.INSTANCE.mealDtoToMeal(mealDto);
         meal.setMealKey(mealKey);
         meal.setRestaurant(restaurant);
 

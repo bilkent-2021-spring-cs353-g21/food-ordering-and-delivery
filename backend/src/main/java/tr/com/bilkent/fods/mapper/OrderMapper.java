@@ -16,12 +16,12 @@ import java.util.List;
 public interface OrderMapper {
     OrderMapper INSTANCE = Mappers.getMapper(OrderMapper.class);
 
-    List<OrderDTO> orderDtosFromOrders(List<Order> orders);
+    List<OrderDTO> ordersToOrderDtos(List<Order> orders);
 
     @Mapping(target = "mealName", source = "meal.mealKey.name")
-    OrderContentDTO orderContentDtoFromOrderContent(OrderContent orderContent);
+    OrderContentDTO orderContentToOrderContentDto(OrderContent orderContent);
 
-    List<OrderContentDTO> orderContentDtosFromOrderContents(List<OrderContent> orderContents);
+    List<OrderContentDTO> orderContentsToOrderContentDtos(List<OrderContent> orderContents);
 
-    OrderWithoutContentDTO orderWithoutContentDtoFromOrder(Order order);
+    OrderWithoutContentDTO orderToOrderWithoutContentDto(Order order);
 }

@@ -6,6 +6,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import tr.com.bilkent.fods.config.MapperConfig;
 import tr.com.bilkent.fods.dto.meal.MealDTO;
+import tr.com.bilkent.fods.dto.search.MealResultDTO;
 import tr.com.bilkent.fods.entity.meal.Meal;
 
 import java.util.List;
@@ -16,10 +17,17 @@ public interface MealMapper {
 
     @Mapping(target = "restaurant", ignore = true)
     @Mapping(target = "mealKey", source = ".")
-    Meal mealFromDto(MealDTO meal);
+    Meal mealDtoToMeal(MealDTO meal);
 
     @InheritInverseConfiguration
-    MealDTO mealDtoFromMeal(Meal meal);
+    MealDTO mealToMealDto(Meal meal);
 
-    List<MealDTO> mealDtosFromMeals(List<Meal> meals);
+    List<MealDTO> mealsToMealDtos(List<Meal> meals);
+
+    @Mapping(target = "rid", source = "mealKey.rid")
+    @Mapping(target = "mealName", source = "mealKey.name")
+    @Mapping(target = "restaurantName", source = "restaurant.name")
+    MealResultDTO mealsToMealResult(Meal meal);
+
+    List<MealResultDTO> mealsToMealResult(List<Meal> meals);
 }
