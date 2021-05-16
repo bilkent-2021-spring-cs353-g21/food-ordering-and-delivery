@@ -136,6 +136,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
     }
 
+    @ExceptionHandler(NonExistsAddressException.class)
+    public ResponseEntity<Object> handleNonExistsAddressException(NonExistsAddressException ex) {
+        log.info("Address does not exist: {}", ex.toString());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>("Address does not exist.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
+    }
+
     @ExceptionHandler(OrderNotFromRestaurantException.class)
     public ResponseEntity<Object> handleOrderNotFromRestaurantException(OrderNotFromRestaurantException ex) {
         log.info("Order restaurant mismatch: oid = {} rid = {}", ex.getOid(), ex.getRid());
@@ -164,6 +171,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.info("Restaurant is not managed by the signed-in manager: rid = {}", ex.getRid());
         CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
                 "Restaurant does not exist, or you don't have access to it.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
+    }
+
+    @ExceptionHandler(InOrderIndexInvalidException.class)
+    public ResponseEntity<Object> handleInOrderIndexInvalidException(InOrderIndexInvalidException ex) {
+        log.info("In order index invalid: {}", ex.toString());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>("In order index is invalid.");
         return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
     }
 

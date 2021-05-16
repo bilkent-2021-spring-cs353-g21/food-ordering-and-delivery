@@ -1,8 +1,7 @@
 package tr.com.bilkent.fods.entity.restaurant;
 
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import tr.com.bilkent.fods.entity.EntityBase;
 import tr.com.bilkent.fods.entity.district.District;
 import tr.com.bilkent.fods.entity.restaurantmanager.RestaurantManager;
 
@@ -16,7 +15,7 @@ import java.util.List;
 @Setter
 @ToString
 @Entity(name = "restaurant")
-public class Restaurant {
+public class Restaurant extends EntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rid;
@@ -43,6 +42,5 @@ public class Restaurant {
     private List<String> tags;
 
     @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private RestaurantManager manager;
 }

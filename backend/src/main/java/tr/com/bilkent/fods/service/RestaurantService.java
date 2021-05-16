@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tr.com.bilkent.fods.dto.comment.CommentDTO;
 import tr.com.bilkent.fods.dto.comment.CommentListDTO;
 import tr.com.bilkent.fods.dto.meal.MealDTO;
@@ -95,6 +96,7 @@ public class RestaurantService {
         return RestaurantMapper.INSTANCE.restaurantToDto(restaurant);
     }
 
+    @Transactional
     public void deleteRestaurant(long rid, String username) {
         Restaurant restaurant = getManagedRestaurant(rid, username);
         restaurantRepository.delete(restaurant);
@@ -167,6 +169,7 @@ public class RestaurantService {
         mealRepository.save(meal);
     }
 
+    @Transactional
     public void deleteMeal(long rid, String username, MealNameDTO meal) {
         getManagedRestaurant(rid, username);
         MealKey mealKey = new MealKey(rid, meal.getName());

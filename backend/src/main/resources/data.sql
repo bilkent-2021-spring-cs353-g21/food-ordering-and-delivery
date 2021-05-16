@@ -1,5 +1,5 @@
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE cs353.district;
+SET FOREIGN_KEY_CHECKS = 0 $$
+TRUNCATE TABLE cs353.district $$
 INSERT INTO cs353.district(cs353.district.city_name, cs353.district.district_name)
 VALUES ("adana", "seyhan"),
        ("adana", "yüreğir"),
@@ -961,5 +961,48 @@ VALUES ("adana", "seyhan"),
        ("düzce", "çilimli"),
        ("düzce", "yığılca"),
        ("düzce", "gümüşova"),
-       ("düzce", "cumayeri");
-SET FOREIGN_KEY_CHECKS = 1;
+       ("düzce", "cumayeri") $$
+SET FOREIGN_KEY_CHECKS = 1 $$
+
+DROP TRIGGER IF EXISTS cs353.on_manager_delete $$
+CREATE TRIGGER on_manager_delete
+    AFTER UPDATE
+    ON restaurant_manager
+    FOR EACH ROW
+BEGIN
+    IF NEW.deleted = 1 THEN
+        UPDATE restaurant R SET R.deleted = 1 WHERE R.manager_username = NEW.username;
+    END IF;
+END;
+$$
+
+DROP TRIGGER IF EXISTS on_restaurant_delete $$
+CREATE TRIGGER on_restaurant_delete
+    AFTER UPDATE
+    ON restaurant
+    FOR EACH ROW
+BEGIN
+    IF NEW.deleted = 1 THEN
+        UPDATE meal M SET M.deleted = 1 WHERE M.rid = NEW.rid;
+        DELETE W FROM works_with W WHERE W.restaurant_id = NEW.rid;
+        DELETE D FROM discount D WHERE D.rid = NEW.rid;
+        DELETE S FROM serves S WHERE S.rid = NEW.rid;
+        DELETE T FROM restaurant_tags T WHERE T.rid = NEW.rid;
+    END IF;
+END;
+$$
+
+DROP TRIGGER IF EXISTS on_address_activation $$
+CREATE TRIGGER on_address_activation
+    AFTER UPDATE
+    ON delivery_address
+    FOR EACH ROW
+BEGIN
+    IF NEW.active = 1 THEN
+        UPDATE delivery_address A
+        SET A.active = 0
+        WHERE A.username = NEW.username
+          AND (A.city_name, A.district_name) <> (NEW.city_name, NEW.district_name);
+    END IF;
+END;
+$$

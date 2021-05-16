@@ -16,7 +16,7 @@ import java.sql.Date;
 @Getter
 @Setter
 @MappedSuperclass
-public class User {
+public class User extends EntityBase {
     @Id
     private String username;
 

@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import tr.com.bilkent.fods.entity.EntityBase;
 import tr.com.bilkent.fods.entity.restaurant.Restaurant;
 
 import javax.persistence.*;
@@ -16,13 +15,12 @@ import java.util.List;
 @Getter
 @Setter
 @Entity(name = "meal")
-public class Meal {
+public class Meal extends EntityBase {
     @EmbeddedId
     private MealKey mealKey;
 
     @ManyToOne
     @MapsId("rid")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "rid")
     private Restaurant restaurant;
 

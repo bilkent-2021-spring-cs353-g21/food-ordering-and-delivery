@@ -12,6 +12,7 @@ spring:
     username: cs353
     password: cs353
     initialization-mode: always
+    separator: $$
 
   jpa:
     hibernate:

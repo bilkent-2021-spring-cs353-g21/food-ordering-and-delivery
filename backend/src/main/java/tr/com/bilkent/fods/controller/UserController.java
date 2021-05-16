@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -51,18 +50,5 @@ public class UserController {
         userService.edit(username, userType.getEntityClass(), user);
 
         return new CustomHTTPResponse<>("Account successfully modified.");
-    }
-
-    @ApiOperation("Delete the account of the logged-in user.")
-    @DeleteMapping("/account")
-    public CustomHTTPResponse<Void> deleteAccount(@PathVariable UserType userType,
-                                                  @ApiIgnore Authentication authentication) {
-        log.info("{} delete account request", userType.getName());
-
-        String username = authentication.getName();
-        userService.delete(username, userType.getEntityClass());
-
-        SecurityContextHolder.clearContext();
-        return new CustomHTTPResponse<>("Account deleted.");
     }
 }

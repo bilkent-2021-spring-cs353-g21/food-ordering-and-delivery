@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import tr.com.bilkent.fods.entity.restaurant.Restaurant;
 
 import javax.persistence.*;
@@ -22,7 +20,6 @@ public class Schedule {
 
     @ManyToOne
     @MapsId("rid")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "rid")
     private Restaurant restaurant;
 

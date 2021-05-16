@@ -33,4 +33,6 @@ public class DeliveryAddress {
 
     @Column(length = 512)
     private String description;
+
+    private Boolean active;
 }

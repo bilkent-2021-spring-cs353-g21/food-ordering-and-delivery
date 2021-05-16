@@ -4,16 +4,16 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+import tr.com.bilkent.fods.dto.district.DistrictDTO;
 import tr.com.bilkent.fods.dto.meal.AddToBasketDTO;
+import tr.com.bilkent.fods.dto.meal.BasketContentDTO;
 import tr.com.bilkent.fods.dto.rest.CustomHTTPResponse;
 import tr.com.bilkent.fods.service.OrderingService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -26,14 +26,45 @@ public class CustomerController {
         this.orderingService = orderingService;
     }
 
+    @ApiOperation("Get basket.")
+    @GetMapping("/basket")
+    public CustomHTTPResponse<List<BasketContentDTO>> getBasket(@ApiIgnore Authentication authentication) {
+        log.info("Get basket request");
+
+        String username = authentication.getName();
+        return new CustomHTTPResponse<>(orderingService.getBasket(username));
+    }
+
     @ApiOperation("Add to basket.")
     @PutMapping("/basket")
     public CustomHTTPResponse<Void> addToBasket(@RequestBody @Valid AddToBasketDTO meal,
                                                 @ApiIgnore Authentication authentication) {
-        log.info("Add to basket: {}", meal);
+        log.info("Add to basket request: {}", meal);
 
         String username = authentication.getName();
         orderingService.addToBasket(username, meal);
         return new CustomHTTPResponse<>("Added to basket");
+    }
+
+    @ApiOperation("Remove from basket.")
+    @DeleteMapping("/basket/{in_order_index}")
+    public CustomHTTPResponse<Void> removeFromBasket(@PathVariable("in_order_index") int inOrderIndex,
+                                                     @ApiIgnore Authentication authentication) {
+        log.info("Remove from basket request: index = {}", inOrderIndex);
+
+        String username = authentication.getName();
+        orderingService.removeFromBasket(username, inOrderIndex);
+        return new CustomHTTPResponse<>("Removed from basket");
+    }
+
+    @ApiOperation("Activate delivery address.")
+    @PostMapping("/address")
+    public CustomHTTPResponse<Void> removeFromBasket(@RequestBody DistrictDTO address,
+                                                     @ApiIgnore Authentication authentication) {
+        log.info("Activate delivery address request: {}", address);
+
+        String username = authentication.getName();
+        orderingService.activateDeliveryAddress(username, address);
+        return new CustomHTTPResponse<>("Address activated");
     }
 }

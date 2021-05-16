@@ -4,6 +4,7 @@ import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import tr.com.bilkent.fods.config.MapperConfig;
 import tr.com.bilkent.fods.dto.meal.AddToBasketDTO;
+import tr.com.bilkent.fods.dto.meal.BasketContentDTO;
 import tr.com.bilkent.fods.dto.meal.MealDTO;
 import tr.com.bilkent.fods.dto.search.MealResultDTO;
 import tr.com.bilkent.fods.entity.meal.Meal;
@@ -40,4 +41,13 @@ public interface MealMapper {
     @Mapping(target = "meal", ignore = true)
     @Mapping(target = "order", ignore = true)
     OrderContent addToBasketDtoToOrderContent(AddToBasketDTO meal);
+
+    @Mapping(target = "price", source = "meal.price")
+    @Mapping(target = "inOrderIndex", source = "orderContentKey.inOrderIndex")
+    @Mapping(target = "rid", source = "orderContentKey.mealKey.rid")
+    @Mapping(target = "name", source = "orderContentKey.mealKey.name")
+    @Mapping(target = "description", source = "meal.description")
+    BasketContentDTO orderContentToBasketContentDto(OrderContent orderContent);
+
+    List<BasketContentDTO> orderContentsToBasketContentDto(List<OrderContent> orderContents);
 }

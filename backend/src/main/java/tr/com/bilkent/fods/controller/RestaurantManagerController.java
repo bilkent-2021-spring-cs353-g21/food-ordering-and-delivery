@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+import tr.com.bilkent.fods.controller.enums.UserType;
 import tr.com.bilkent.fods.dto.comment.CommentListDTO;
 import tr.com.bilkent.fods.dto.meal.MealDTO;
 import tr.com.bilkent.fods.dto.meal.MealNameDTO;
@@ -16,6 +18,7 @@ import tr.com.bilkent.fods.dto.rest.CustomHTTPResponse;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantDTO;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantNameDTO;
 import tr.com.bilkent.fods.service.RestaurantService;
+import tr.com.bilkent.fods.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -26,11 +29,26 @@ import java.util.List;
 @Validated
 @RequestMapping("/manager")
 public class RestaurantManagerController {
+    private final UserService userService;
     private final RestaurantService restaurantService;
 
     @Autowired
-    public RestaurantManagerController(RestaurantService restaurantService) {
+    public RestaurantManagerController(UserService userService,
+                                       RestaurantService restaurantService) {
+        this.userService = userService;
         this.restaurantService = restaurantService;
+    }
+
+    @ApiOperation("Delete the account of the logged-in user.")
+    @DeleteMapping("/account")
+    public CustomHTTPResponse<Void> deleteAccount(@ApiIgnore Authentication authentication) {
+        log.info("Manager delete account request");
+
+        String username = authentication.getName();
+        userService.delete(username, UserType.MANAGER.getEntityClass());
+
+        SecurityContextHolder.clearContext();
+        return new CustomHTTPResponse<>("Account deleted.");
     }
 
     @ApiOperation("Retrieve the names and IDs of the restaurant managed by the logged-in user.")
@@ -151,7 +169,7 @@ public class RestaurantManagerController {
 
         String username = authentication.getName();
         restaurantService.editMeal(rid, username, meal);
-        return new CustomHTTPResponse<>("Meal successfully deleted from the system.");
+        return new CustomHTTPResponse<>("Meal successfully modified in the system.");
     }
 
     @ApiOperation("Delete a meal in the restaurant.")
