@@ -119,6 +119,10 @@ public class UserService {
         }
     }
 
+    protected void createCustomerBasket(String username) {
+        setupCustomerAccount((Customer) getUser(username));
+    }
+
     private void setupCustomerAccount(Customer customer) {
         Order order = new Order();
         order.setBelongsTo(customer);

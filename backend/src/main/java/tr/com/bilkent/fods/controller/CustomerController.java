@@ -13,6 +13,7 @@ import tr.com.bilkent.fods.dto.rest.CustomHTTPResponse;
 import tr.com.bilkent.fods.service.OrderingService;
 
 import javax.validation.Valid;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Slf4j
@@ -66,5 +67,16 @@ public class CustomerController {
         String username = authentication.getName();
         orderingService.activateDeliveryAddress(username, address);
         return new CustomHTTPResponse<>("Address activated");
+    }
+
+    @ApiOperation("Place an order using the current basket and active address. Returns order id in data field.")
+    @PostMapping("/order")
+    public CustomHTTPResponse<Long> placeOrder(@RequestBody Timestamp requestedDeliveryTime,
+                                               @ApiIgnore Authentication authentication) {
+        log.info("Place order request: {}", requestedDeliveryTime);
+
+        String username = authentication.getName();
+        Long oid = orderingService.placeOrder(username, requestedDeliveryTime);
+        return new CustomHTTPResponse<>(oid, "Order placed.");
     }
 }

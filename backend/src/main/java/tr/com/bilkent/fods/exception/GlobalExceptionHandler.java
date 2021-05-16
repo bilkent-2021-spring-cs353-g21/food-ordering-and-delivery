@@ -151,6 +151,28 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
     }
 
+    @ExceptionHandler(NoActiveAddressException.class)
+    public ResponseEntity<Object> handleNoActiveAddressException(NoActiveAddressException ex) {
+        log.info("No active address found: {}", ex.toString());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>("No active address found.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_NOT_FOUND);
+    }
+
+    @ExceptionHandler(BasketEmptyException.class)
+    public ResponseEntity<Object> handleBasketEmptyException(BasketEmptyException ex) {
+        log.info("Basket is empty: {}", ex.toString());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>("Basket is empty.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnderMinDeliveryCostException.class)
+    public ResponseEntity<Object> handleUnderMinDeliveryCostException(UnderMinDeliveryCostException ex) {
+        log.info("Under minimum delivery cost: {}", ex.toString());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>(
+                ex.getCurrent() + "under minimum delivery cost " + ex.getMinDeliveryCost() + ":");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_BAD_REQUEST);
+    }
+
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex) {
         log.info("Empty result set: {}", ex.getMessage());

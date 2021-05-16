@@ -8,6 +8,7 @@ import tr.com.bilkent.fods.entity.deliveryaddress.DeliveryAddress;
 import tr.com.bilkent.fods.entity.deliveryaddress.DeliveryAddressKey;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress, DeliveryAddressKey> {
     @Query(value = "SELECT * FROM delivery_address WHERE username = ?1", nativeQuery = true)
@@ -17,4 +18,7 @@ public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress
     @Query(value = "UPDATE delivery_address SET active = 1 WHERE " +
             "username = ?1 AND city_name = ?2 AND district_name = ?3", nativeQuery = true)
     int activateAddress(String username, String cityName, String districtName);
+
+    @Query(value = "SELECT * FROM delivery_address WHERE username = ?1 AND active = 1 LIMIT 1", nativeQuery = true)
+    Optional<DeliveryAddress> getActiveAddress(String username);
 }

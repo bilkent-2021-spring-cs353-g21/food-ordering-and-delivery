@@ -7,14 +7,19 @@ import org.springframework.transaction.annotation.Transactional;
 import tr.com.bilkent.fods.dto.district.DistrictDTO;
 import tr.com.bilkent.fods.dto.meal.AddToBasketDTO;
 import tr.com.bilkent.fods.dto.meal.BasketContentDTO;
+import tr.com.bilkent.fods.entity.deliveryaddress.DeliveryAddress;
 import tr.com.bilkent.fods.entity.meal.Meal;
 import tr.com.bilkent.fods.entity.meal.MealKey;
 import tr.com.bilkent.fods.entity.order.Order;
+import tr.com.bilkent.fods.entity.order.OrderStatus;
 import tr.com.bilkent.fods.entity.ordercontent.OrderContent;
 import tr.com.bilkent.fods.exception.*;
+import tr.com.bilkent.fods.mapper.DistrictMapper;
 import tr.com.bilkent.fods.mapper.MealMapper;
 import tr.com.bilkent.fods.repository.*;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 @Slf4j
@@ -25,18 +30,21 @@ public class OrderingService {
     private final OrderContentRepository orderContentRepository;
     private final MealRepository mealRepository;
     private final DeliveryAddressRepository deliveryAddressRepository;
+    private final UserService userService;
 
     @Autowired
     public OrderingService(RestaurantRepository restaurantRepository,
                            OrderRepository orderRepository,
                            OrderContentRepository orderContentRepository,
                            MealRepository mealRepository,
-                           DeliveryAddressRepository deliveryAddressRepository) {
+                           DeliveryAddressRepository deliveryAddressRepository,
+                           UserService userService) {
         this.restaurantRepository = restaurantRepository;
         this.orderRepository = orderRepository;
         this.orderContentRepository = orderContentRepository;
         this.mealRepository = mealRepository;
         this.deliveryAddressRepository = deliveryAddressRepository;
+        this.userService = userService;
     }
 
     @Transactional
@@ -60,6 +68,7 @@ public class OrderingService {
 
         basket.setFromRestaurant(restaurantRepository.findById(dto.getRid()).orElseThrow(
                 () -> new NonExistsRestaurantException(dto.getRid())));
+        basket.setCost(basket.getCost() + basketContent.getMealPrice() * basketContent.getQuantity());
 
         orderRepository.save(basket);
         orderContentRepository.save(basketContent);
@@ -87,5 +96,30 @@ public class OrderingService {
         if (updated == 0) {
             throw new NonExistsAddressException(address.getCityName(), address.getDistrictName());
         }
+    }
+
+    @Transactional
+    public Long placeOrder(String username, Timestamp requestedDeliveryTime) {
+        DeliveryAddress destination = deliveryAddressRepository.getActiveAddress(username)
+                .orElseThrow(NoActiveAddressException::new);
+
+        Order order = orderRepository.getBasket(username);
+        if (order.getFromRestaurant() == null) {
+            throw new BasketEmptyException();
+        }
+        double minDeliveryCost = restaurantRepository.getMinDeliveryCost(order.getFromRestaurant().getRid(),
+                DistrictMapper.INSTANCE.districtToDto(destination.getDistrict()));
+        if (order.getCost() < minDeliveryCost) {
+            throw new UnderMinDeliveryCostException(order.getCost(), minDeliveryCost);
+        }
+
+        order.setPlacedTime(Timestamp.from(Instant.now()));
+        order.setStatus(OrderStatus.WAITING);
+        order.setRequestedDeliveryTime(requestedDeliveryTime);
+        order.setDestination(destination);
+        order = orderRepository.save(order);
+
+        userService.createCustomerBasket(username);
+        return order.getOid();
     }
 }
