@@ -1,7 +1,6 @@
 import {
     makeStyles,
     Paper,
-    Box,
     AppBar,
     Link,
     Toolbar,
@@ -24,7 +23,6 @@ import React from "react";
 }
 import adImg from "~/assets/ad.jpg";
 import MyButton from "~/components/MyButton";
-import MySearch from "~/pages/Search";
 
 const useStyles = makeStyles((theme) => ({
     background: {
