@@ -1,18 +1,15 @@
 import React from "react";
-import Signup from "./Signup/Signup";
-import Signin from "./Signin/Signin";
-import Home from "./Home";
-import ManagerLanding from "./ManagerLanding/ManagerLanding";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import Landing from "./pages/Landing";
+import Search from "./pages/Search";
+import Restaurant from "./pages/Restaurant";
+import Order from "./pages/Order";
 
 function App() {
     return (
         <Router>
             <Switch>
-                <Route exact path="/" component={Home}></Route>
-                <Route exact path="/signup" component={Signup}></Route>
-                <Route exact path="/signin" component={Signin}></Route>
-                <Route exact path="/manager" component={ManagerLanding}></Route>
+                <Route exact path="" component={Restaurant}></Route>
             </Switch>
         </Router>
     );
