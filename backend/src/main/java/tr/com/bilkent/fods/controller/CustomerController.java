@@ -3,6 +3,7 @@ package tr.com.bilkent.fods.controller;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -71,7 +72,8 @@ public class CustomerController {
 
     @ApiOperation("Place an order using the current basket and active address. Returns order id in data field.")
     @PostMapping("/order")
-    public CustomHTTPResponse<Long> placeOrder(@RequestBody Timestamp requestedDeliveryTime,
+    public CustomHTTPResponse<Long> placeOrder(@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+                                               @RequestBody Timestamp requestedDeliveryTime,
                                                @ApiIgnore Authentication authentication) {
         log.info("Place order request: {}", requestedDeliveryTime);
 

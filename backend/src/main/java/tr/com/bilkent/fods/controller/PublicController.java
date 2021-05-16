@@ -79,11 +79,8 @@ public class PublicController {
 
     @ApiOperation("Get meals of the restaurant sorted by type.")
     @GetMapping("/restaurant/{rid}/meals")
-    public CustomHTTPResponse<List<MealDTO>> getMeals(@PathVariable("rid") long rid,
-                                                      @ApiIgnore Authentication authentication) {
+    public CustomHTTPResponse<List<MealDTO>> getMeals(@PathVariable("rid") long rid) {
         log.info("Get meals request: rid = {}", rid);
-
-        String username = authentication.getName();
-        return new CustomHTTPResponse<>(restaurantService.getMeals(rid, username));
+        return new CustomHTTPResponse<>(restaurantService.getMeals(rid));
     }
 }

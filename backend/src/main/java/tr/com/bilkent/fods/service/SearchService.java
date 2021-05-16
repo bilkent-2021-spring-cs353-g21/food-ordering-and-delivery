@@ -45,8 +45,6 @@ public class SearchService {
         MealSearchResultsDTO mealSearchResults = new MealSearchResultsDTO(meals.getTotalElements(),
                 meals.getTotalPages(), MealMapper.INSTANCE.mealsToMealResult(meals.getContent()));
 
-        SearchResultDTO searchResult = new SearchResultDTO(restaurantResult, mealSearchResults);
-        log.warn("{}", searchResult);
-        return searchResult;
+        return new SearchResultDTO(restaurantResult, mealSearchResults);
     }
 }

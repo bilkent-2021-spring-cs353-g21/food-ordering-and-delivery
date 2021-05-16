@@ -165,6 +165,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_BAD_REQUEST);
     }
 
+    @ExceptionHandler(DistrictNotServedException.class)
+    public ResponseEntity<Object> handleDistrictNotServedException(DistrictNotServedException ex) {
+        log.info("District is not being served: {}", ex.toString());
+        CustomHTTPResponse<Void> bodyOfResponse = new CustomHTTPResponse<>("District is not being served.");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), SC_BAD_REQUEST);
+    }
+
     @ExceptionHandler(UnderMinDeliveryCostException.class)
     public ResponseEntity<Object> handleUnderMinDeliveryCostException(UnderMinDeliveryCostException ex) {
         log.info("Under minimum delivery cost: {}", ex.toString());

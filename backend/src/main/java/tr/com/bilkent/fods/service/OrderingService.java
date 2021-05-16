@@ -13,6 +13,7 @@ import tr.com.bilkent.fods.entity.meal.MealKey;
 import tr.com.bilkent.fods.entity.order.Order;
 import tr.com.bilkent.fods.entity.order.OrderStatus;
 import tr.com.bilkent.fods.entity.ordercontent.OrderContent;
+import tr.com.bilkent.fods.entity.serves.RestaurantDistrictKey;
 import tr.com.bilkent.fods.exception.*;
 import tr.com.bilkent.fods.mapper.DistrictMapper;
 import tr.com.bilkent.fods.mapper.MealMapper;
@@ -21,11 +22,13 @@ import tr.com.bilkent.fods.repository.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 public class OrderingService {
     private final RestaurantRepository restaurantRepository;
+    private final ServesRepository servesRepository;
     private final OrderRepository orderRepository;
     private final OrderContentRepository orderContentRepository;
     private final MealRepository mealRepository;
@@ -34,12 +37,14 @@ public class OrderingService {
 
     @Autowired
     public OrderingService(RestaurantRepository restaurantRepository,
+                           ServesRepository servesRepository,
                            OrderRepository orderRepository,
                            OrderContentRepository orderContentRepository,
                            MealRepository mealRepository,
                            DeliveryAddressRepository deliveryAddressRepository,
                            UserService userService) {
         this.restaurantRepository = restaurantRepository;
+        this.servesRepository = servesRepository;
         this.orderRepository = orderRepository;
         this.orderContentRepository = orderContentRepository;
         this.mealRepository = mealRepository;
@@ -53,7 +58,16 @@ public class OrderingService {
                 () -> new NonExistsMealException(dto.getRid(), dto.getName()));
         Order basket = orderRepository.getBasket(username);
 
-        if (basket.getFromRestaurant() != null && basket.getFromRestaurant().getRid() != dto.getRid()) {
+        if (basket.getFromRestaurant() == null) {
+            // Check if restaurant delivers to the active address
+            DeliveryAddress address = deliveryAddressRepository.getActiveAddress(username)
+                    .orElseThrow(NoActiveAddressException::new);
+            if (!servesRepository
+                    .findById(new RestaurantDistrictKey(dto.getRid(), address.getDistrict().getDistrictKey()))
+                    .isPresent()) {
+                throw new DistrictNotServedException(dto.getRid(), address.getDistrict().getDistrictKey());
+            }
+        } else if (basket.getFromRestaurant().getRid() != dto.getRid()) {
             throw new BasketContentMultipleRestaurantsException();
         }
 
@@ -68,7 +82,8 @@ public class OrderingService {
 
         basket.setFromRestaurant(restaurantRepository.findById(dto.getRid()).orElseThrow(
                 () -> new NonExistsRestaurantException(dto.getRid())));
-        basket.setCost(basket.getCost() + basketContent.getMealPrice() * basketContent.getQuantity());
+        double currentCost = basket.getCost() == null ? 0 : basket.getCost();
+        basket.setCost(currentCost + basketContent.getMealPrice() * basketContent.getQuantity());
 
         orderRepository.save(basket);
         orderContentRepository.save(basketContent);
@@ -91,6 +106,12 @@ public class OrderingService {
 
     @Transactional
     public void activateDeliveryAddress(String username, DistrictDTO address) {
+        Optional<DeliveryAddress> previous = deliveryAddressRepository.getActiveAddress(username);
+        if (previous.isPresent()) {
+            previous.get().setActive(false);
+            deliveryAddressRepository.save(previous.get());
+        }
+
         int updated = deliveryAddressRepository
                 .activateAddress(username, address.getCityName(), address.getDistrictName());
         if (updated == 0) {
@@ -107,7 +128,7 @@ public class OrderingService {
         if (order.getFromRestaurant() == null) {
             throw new BasketEmptyException();
         }
-        double minDeliveryCost = restaurantRepository.getMinDeliveryCost(order.getFromRestaurant().getRid(),
+        Double minDeliveryCost = restaurantRepository.getMinDeliveryCost(order.getFromRestaurant().getRid(),
                 DistrictMapper.INSTANCE.districtToDto(destination.getDistrict()));
         if (order.getCost() < minDeliveryCost) {
             throw new UnderMinDeliveryCostException(order.getCost(), minDeliveryCost);

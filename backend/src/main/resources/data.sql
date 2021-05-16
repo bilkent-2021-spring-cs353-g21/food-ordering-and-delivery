@@ -991,18 +991,3 @@ BEGIN
     END IF;
 END;
 $$
-
-DROP TRIGGER IF EXISTS on_address_activation $$
-CREATE TRIGGER on_address_activation
-    AFTER UPDATE
-    ON delivery_address
-    FOR EACH ROW
-BEGIN
-    IF NEW.active = 1 THEN
-        UPDATE delivery_address A
-        SET A.active = 0
-        WHERE A.username = NEW.username
-          AND (A.city_name, A.district_name) <> (NEW.city_name, NEW.district_name);
-    END IF;
-END;
-$$

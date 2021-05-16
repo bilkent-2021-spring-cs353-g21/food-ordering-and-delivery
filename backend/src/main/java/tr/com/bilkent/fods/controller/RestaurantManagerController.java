@@ -12,7 +12,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import tr.com.bilkent.fods.controller.enums.UserType;
 import tr.com.bilkent.fods.dto.comment.CommentListDTO;
 import tr.com.bilkent.fods.dto.meal.MealDTO;
-import tr.com.bilkent.fods.dto.meal.MealNameDTO;
 import tr.com.bilkent.fods.dto.order.OrderListDTO;
 import tr.com.bilkent.fods.dto.rest.CustomHTTPResponse;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantDTO;
@@ -173,14 +172,14 @@ public class RestaurantManagerController {
     }
 
     @ApiOperation("Delete a meal in the restaurant.")
-    @DeleteMapping("/restaurant/{rid}/meals")
+    @DeleteMapping("/restaurant/{rid}/meals/{mealName}")
     public CustomHTTPResponse<Void> deleteMeal(@PathVariable("rid") long rid,
-                                               @RequestBody @Valid MealNameDTO meal,
+                                               @PathVariable("mealName") String mealName,
                                                @ApiIgnore Authentication authentication) {
-        log.info("Delete meal request: rid = {} meal = {}", rid, meal);
+        log.info("Delete meal request: rid = {} mealName = {}", rid, mealName);
 
         String username = authentication.getName();
-        restaurantService.deleteMeal(rid, username, meal);
+        restaurantService.deleteMeal(rid, username, mealName);
         return new CustomHTTPResponse<>("Meal successfully deleted from the system.");
     }
 

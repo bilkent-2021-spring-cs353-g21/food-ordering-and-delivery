@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import tr.com.bilkent.fods.dto.comment.CommentDTO;
 import tr.com.bilkent.fods.dto.comment.CommentListDTO;
 import tr.com.bilkent.fods.dto.meal.MealDTO;
-import tr.com.bilkent.fods.dto.meal.MealNameDTO;
 import tr.com.bilkent.fods.dto.order.OrderDTO;
 import tr.com.bilkent.fods.dto.order.OrderListDTO;
 import tr.com.bilkent.fods.dto.restaurant.RestaurantDTO;
@@ -139,8 +138,9 @@ public class RestaurantService {
         commentRepository.save(comment);
     }
 
-    public List<MealDTO> getMeals(long rid, String username) {
-        Restaurant restaurant = getManagedRestaurant(rid, username);
+    public List<MealDTO> getMeals(long rid) {
+        Restaurant restaurant = restaurantRepository.findById(rid).orElseThrow(
+                () -> new NonExistsRestaurantException(rid));
         List<Meal> meals = mealRepository.getMenu(restaurant);
         return MealMapper.INSTANCE.mealsToMealDtos(meals);
     }
@@ -170,9 +170,9 @@ public class RestaurantService {
     }
 
     @Transactional
-    public void deleteMeal(long rid, String username, MealNameDTO meal) {
+    public void deleteMeal(long rid, String username, String mealName) {
         getManagedRestaurant(rid, username);
-        MealKey mealKey = new MealKey(rid, meal.getName());
+        MealKey mealKey = new MealKey(rid, mealName);
         mealRepository.deleteById(mealKey);
     }
 

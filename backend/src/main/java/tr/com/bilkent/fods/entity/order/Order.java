@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import tr.com.bilkent.fods.entity.customer.Customer;
 import tr.com.bilkent.fods.entity.deliveryaddress.DeliveryAddress;
-import tr.com.bilkent.fods.entity.district.District;
 import tr.com.bilkent.fods.entity.enumconverter.OrderStatusConverter;
 import tr.com.bilkent.fods.entity.restaurant.Restaurant;
 
@@ -43,5 +42,8 @@ public class Order {
     private Customer belongsTo;
 
     @ManyToOne
+    @JoinColumn(name = "destination_username", referencedColumnName = "username")
+    @JoinColumn(name = "destination_city_name", referencedColumnName = "city_name")
+    @JoinColumn(name = "destination_district_name", referencedColumnName = "district_name")
     private DeliveryAddress destination;
 }
