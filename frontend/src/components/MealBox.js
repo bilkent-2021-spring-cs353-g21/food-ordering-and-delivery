@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { withStyles, Typography, Box, Divider } from "@material-ui/core";
 import MyButton from "~components/MyButton";
 
@@ -12,7 +13,7 @@ const popAdd = (e) => {
     e.preventDefault();
 };
 
-export default function MealBox() {
+export default function MealBox(props) {
     return (
         <CustomBox>
             <MyButton onClick={popAdd} style={{ float: "right" }}>
@@ -26,13 +27,13 @@ export default function MealBox() {
                     paddingTop: 10,
                 }}
             >
-                26.50 TL
+                {props.meal && props.meal.price}
             </Typography>
             <Typography variant="h6">
                 <b>Chicken Burrito</b>
             </Typography>
 
-            <Typography variant="h7">
+            <Typography>
                 Marineted chicken pieces inside tortilla and tomato and potato
                 and citato and bla bla
             </Typography>
@@ -40,3 +41,7 @@ export default function MealBox() {
         </CustomBox>
     );
 }
+
+MealBox.propTypes = {
+    meal: PropTypes.object.isRequired,
+};
