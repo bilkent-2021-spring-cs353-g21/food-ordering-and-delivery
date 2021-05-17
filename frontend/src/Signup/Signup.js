@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import FormSignup from "./FormSignup";
 import FormSuccess from "./FormSuccess";
 
-const signupBackground = makeStyles((theme) => ({
+const signupBackground = makeStyles(() => ({
     root: {
         minHeight: "100vh",
         display: "flex",

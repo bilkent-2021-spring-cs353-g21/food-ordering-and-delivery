@@ -20,6 +20,10 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import PropTypes from "prop-types";
 import MaskedInput from "react-text-mask";
 import NumberFormat from "react-number-format";
+import axios from "axios";
+import request from "../../Service/request";
+import { getLocalStorage } from "../../Service/localStorage";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 
 function NumberFormatCustom(props) {
     const { inputRef, onChange, ...other } = props;
@@ -61,11 +65,19 @@ const columns = [
         minWidth: 50,
         format: (value) => value.toLocaleString("en-US"),
     },
-    { id: "actions", label: "Actions" },
+    { id: "actions", label: "Finalize" },
 ];
 
-function createData(content, placedTime, requestTime, status, price, actions) {
-    return { content, placedTime, requestTime, status, price, actions };
+function createData(
+    content,
+    placedTime,
+    requestTime,
+    status,
+    price,
+    actions,
+    oid
+) {
+    return { content, placedTime, requestTime, status, price, actions, oid };
 }
 
 const useStyles = makeStyles({
@@ -74,14 +86,19 @@ const useStyles = makeStyles({
         width: "100%",
     },
     container: {
-        maxHeight: 440,
+        maxHeight: 1000,
     },
 });
 
 export default function StickyHeadTable() {
     const classes = useStyles();
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalOrders, setTotalOrders] = useState(0);
+    const [orderIndex, setOrderIndex] = useState(0);
+    const [orders, setOrders] = useState([]);
+    const [finalize, setFinalize] = useState(false);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -89,6 +106,7 @@ export default function StickyHeadTable() {
 
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(+event.target.value);
+
         setPage(0);
     };
 
@@ -102,50 +120,123 @@ export default function StickyHeadTable() {
         setOpen(false);
     };
 
-    const rows = [
-        createData(
-            "Some dish",
-            "10",
-            "egg, fish",
-            "Food, substance consisting essentially of protein, carbohydrate, fat, and other nutrients used in the body of an organism to sustain growth and vital processes and to furnish energy.",
-            <>
-                <IconButton onClick={handleClickOpen}>
-                    <EditIcon style={{ fill: "green" }} />
-                </IconButton>
-                <IconButton>
-                    <DeleteIcon style={{ fill: "red" }} />
-                </IconButton>
-            </>
-        ),
-        createData(
-            "Some dish",
-            "10",
-            "egg, fish",
-            "Food, substance consisting essentially of protein, carbohydrate, fat, and other nutrients used in the body of an organism to sustain growth and vital processes and to furnish energy.",
-            <>
-                <IconButton>
-                    <EditIcon style={{ fill: "green" }} />
-                </IconButton>
-                <IconButton>
-                    <DeleteIcon style={{ fill: "red" }} />
-                </IconButton>
-            </>
-        ),
-        createData(
-            "Some dish",
-            "10",
-            "egg, fish",
-            "Food, substance consisting essentially of protein, carbohydrate, fat, and other nutrients used in the body of an organism to sustain growth and vital processes and to furnish energy.",
-            <>
-                <IconButton>
-                    <EditIcon style={{ fill: "green" }} />
-                </IconButton>
-                <IconButton>
-                    <DeleteIcon style={{ fill: "red" }} />
-                </IconButton>
-            </>
-        ),
-    ];
+    const handleClose_ = () => {
+        setFinalize(true);
+        setOpen(false);
+    };
+
+    useEffect(() => {
+        async function finalizeOrder() {
+            const response = await request(
+                axios.post,
+                "/manager/restaurant/" +
+                    getLocalStorage("rid") +
+                    " /orders/" +
+                    orders[orderIndex]["oid"] +
+                    "/request_delivery"
+            );
+            console.log(orders[orderIndex]["oid"]);
+        }
+
+        if (finalize == true) {
+            finalizeOrder();
+            setFinalize(false);
+        }
+    }, [finalize]);
+
+    useEffect(() => {
+        async function getOrders() {
+            const response = await request(
+                axios.get,
+                "/manager/restaurant/" +
+                    getLocalStorage("rid") +
+                    "/orders?page=" +
+                    page +
+                    "&limit=10"
+            );
+            var orders = [];
+            for (var i in response.data.data.orders) {
+                const k = i;
+                var content = "";
+
+                for (var j in response.data.data.orders[i]["content"]) {
+                    content =
+                        Object.keys(response.data.data.orders[i]["content"][j])
+                            .map(function (k) {
+                                if (k == "quantity") {
+                                    return (
+                                        "x" +
+                                        response.data.data.orders[i]["content"][
+                                            j
+                                        ][k] +
+                                        ""
+                                    );
+                                }
+                                if (k == "mealPrice") {
+                                    return (
+                                        "price: " +
+                                        response.data.data.orders[i]["content"][
+                                            j
+                                        ][k]
+                                    );
+                                }
+                                if (k == "ingredients") {
+                                    return (
+                                        "ingredients: " +
+                                        response.data.data.orders[i]["content"][
+                                            j
+                                        ][k].join()
+                                    );
+                                }
+                                return response
+                                    .data.data.orders[i]["content"][j][k];
+                            })
+                            .join(" ") + "\n";
+                }
+
+                orders.push(
+                    createData(
+                        content,
+                        response.data.data.orders[i]["placedTime"],
+                        response.data.data.orders[i]["requestedDeliveryTime"],
+                        response.data.data.orders[i]["status"],
+                        response.data.data.orders[i]["cost"],
+                        <>
+                            <IconButton
+                                onClick={() => {
+                                    handleClickOpen();
+                                    setOrderIndex(k);
+                                }}
+                            >
+                                <CheckCircleIcon style={{ fill: "blue" }} />
+                            </IconButton>
+                        </>,
+                        response.data.data.orders[i]["oid"]
+                    )
+                );
+            }
+            setOrders(orders);
+        }
+
+        getOrders();
+    }, [page]);
+
+    useEffect(() => {
+        async function getTotal() {
+            const response = await request(
+                axios.get,
+                "/manager/restaurant/" +
+                    getLocalStorage("rid") +
+                    "/orders?0=1&limit=1"
+            );
+
+            setTotalOrders(response.data.data.totalOrders);
+            console.log(response.data.data.totalOrders);
+        }
+
+        getTotal();
+    }, []);
+
     return (
         <Paper className={classes.root}>
             <TableContainer className={classes.container}>
@@ -164,43 +255,38 @@ export default function StickyHeadTable() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows
-                            .slice(
-                                page * rowsPerPage,
-                                page * rowsPerPage + rowsPerPage
-                            )
-                            .map((row) => {
-                                return (
-                                    <TableRow
-                                        hover
-                                        role="checkbox"
-                                        tabIndex={-1}
-                                        key={row.code}
-                                    >
-                                        {columns.map((column) => {
-                                            const value = row[column.id];
-                                            return (
-                                                <TableCell
-                                                    key={column.id}
-                                                    align={column.align}
-                                                >
-                                                    {column.format &&
-                                                    typeof value === "number"
-                                                        ? column.format(value)
-                                                        : value}
-                                                </TableCell>
-                                            );
-                                        })}
-                                    </TableRow>
-                                );
-                            })}
+                        {orders.map((orders) => {
+                            return (
+                                <TableRow
+                                    hover
+                                    role="checkbox"
+                                    tabIndex={-1}
+                                    key={orders.code}
+                                >
+                                    {columns.map((column) => {
+                                        const value = orders[column.id];
+                                        return (
+                                            <TableCell
+                                                key={column.id}
+                                                align={column.align}
+                                            >
+                                                {column.format &&
+                                                typeof value === "number"
+                                                    ? column.format(value)
+                                                    : value}
+                                            </TableCell>
+                                        );
+                                    })}
+                                </TableRow>
+                            );
+                        })}
                     </TableBody>
                 </Table>
             </TableContainer>
             <TablePagination
-                rowsPerPageOptions={[10, 25, 100]}
+                rowsPerPageOptions={[10]}
                 component="div"
-                count={rows.length}
+                count={totalOrders}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onChangePage={handleChangePage}
@@ -211,38 +297,15 @@ export default function StickyHeadTable() {
                 onClose={handleClose}
                 aria-labelledby="form-dialog-title"
             >
-                <DialogTitle id="form-dialog-title">Edit Meal</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="name"
-                        label="Name"
-                        fullWidth
-                    />
-                    <TextField
-                        label="Price"
-                        name="numberformat"
-                        id="formatted-numberformat-input"
-                        InputProps={{
-                            inputComponent: NumberFormatCustom,
-                        }}
-                    />
-                    <br></br>
-                    <TextField
-                        id="standard-multiline-flexible"
-                        label="Description"
-                        multiline
-                        rowsMax={4}
-                        fullWidth
-                    />
-                </DialogContent>
+                <DialogTitle id="form-dialog-title">
+                    Do you want to finalize this order?
+                </DialogTitle>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={handleClose} color="primary">
-                        Subscribe
+                    <Button onClick={handleClose_} color="primary">
+                        Yes
                     </Button>
                 </DialogActions>
             </Dialog>

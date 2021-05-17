@@ -10,11 +10,10 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Dialog from "@material-ui/core/Dialog";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import axios from "axios";
 import request from "../../Service/request";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     addButton: {
         fontSize: "17px",
         backgroundColor: "rgb(80, 190, 37)",
@@ -30,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 export const MenuSettings = () => {
     const classes = useStyles();
 
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const [addMeal, setAddMeal] = useState(false);
     const [values, setValues] = useState({});
 
@@ -56,7 +55,7 @@ export const MenuSettings = () => {
                 }
             );
 
-            console.log(response);
+            setAddMeal(false);
         }
 
         if (addMeal == true) {
@@ -173,7 +172,7 @@ export const MenuSettings = () => {
             </div>
             <div className="container">
                 <h1 className="h1">Menu</h1>
-                <MenuTable></MenuTable>
+                <MenuTable mealAdded={addMeal}></MenuTable>
             </div>
         </div>
     );

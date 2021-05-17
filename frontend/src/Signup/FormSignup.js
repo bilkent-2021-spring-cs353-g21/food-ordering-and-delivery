@@ -127,20 +127,23 @@ const FormSignup = ({ submitForm }) => {
                     {errors.password2 && <h2>{errors.password2}</h2>}
                 </div>
                 <br />
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <SignupFormBlackKeyboardDatePicker
-                        autoOk
-                        variant="inline"
-                        inputVariant="outlined"
-                        label="Birth Date"
-                        format="yyyy-MM-dd"
-                        id="birthdate-field"
-                        maxDate={new Date()}
-                        value={selectedDate}
-                        InputAdornmentProps={{ position: "start" }}
-                        onChange={(date) => handleDateChange(date)}
-                    />
-                </MuiPickersUtilsProvider>
+                <div className="signup-form-inputs-date-picker">
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <SignupFormBlackKeyboardDatePicker
+                            autoOk
+                            variant="inline"
+                            inputVariant="outlined"
+                            label="Birth Date"
+                            format="yyyy-MM-dd"
+                            id="birthdate-field"
+                            maxDate={new Date()}
+                            value={selectedDate}
+                            InputAdornmentProps={{ position: "start" }}
+                            onChange={(date) => handleDateChange(date)}
+                        />
+                    </MuiPickersUtilsProvider>
+                </div>
+
                 <br />
                 <div className="signup-form-inputs"></div>
                 <button

@@ -70,9 +70,7 @@ class ManagerLanding extends React.Component {
     }
 
     render() {
-        const { classes, theme } = this.props;
-        const { anchorEl } = this.state;
-        const open = Boolean(anchorEl);
+        const { classes } = this.props;
         const { history } = this.props;
         const isSignedIn = getLocalStorage("isSignedIn");
         if (!isSignedIn) {

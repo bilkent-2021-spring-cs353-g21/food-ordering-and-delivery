@@ -2,18 +2,10 @@ import React, { useState, useEffect } from "react";
 import { TextField, InputAdornment, FormControl } from "@material-ui/core";
 import PropTypes from "prop-types";
 import Button from "@material-ui/core/Button";
-import InputLabel from "@material-ui/core/InputLabel";
-import Input from "@material-ui/core/Input";
 import MaskedInput from "react-text-mask";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Select from "@material-ui/core/Select";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 import axios from "axios";
 import request from "../../Service/request";
-import useForceUpdate from "use-force-update";
 import { getLocalStorage } from "../../Service/localStorage";
-import { Controller } from "react-hook-form";
 import useForm from "./useForm";
 import validate from "./validateInfo.js";
 import { OutlinedInput } from "@material-ui/core";
@@ -83,10 +75,10 @@ function TextMaskCustom(props) {
     );
 }
 TextMaskCustom.propTypes = {
-    inputRef: PropTypes.object.isRequired,
+    inputRef: PropTypes.func.isRequired,
 };
 
-const RestaurantSettings = ({ submitForm }) => {
+const RestaurantSettings = () => {
     // For form submit
     const [open_, setOpen_] = React.useState(false);
     const [submitResult, setSubmitResult] = useState("");
@@ -100,7 +92,6 @@ const RestaurantSettings = ({ submitForm }) => {
     };
 
     const { handleSubmit, values, setValues, errors } = useForm(
-        submitForm,
         validate,
         handleClickOpen_,
         setSubmitResult
@@ -371,10 +362,6 @@ const RestaurantSettings = ({ submitForm }) => {
             </div>
         </div>
     );
-};
-
-RestaurantSettings.propTypes = {
-    submitForm: PropTypes.object.isRequired,
 };
 
 // To customize material ui textfield

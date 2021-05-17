@@ -125,7 +125,7 @@ function RestaurantItem({ restaurant, callback }) {
 }
 RestaurantItem.propTypes = {
     restaurant: PropTypes.object.isRequired,
-    callback: PropTypes.object.isRequired,
+    callback: PropTypes.func.isRequired,
 };
 
 function Restaurants({ parentsParentCallback }) {
@@ -148,10 +148,10 @@ function Restaurants({ parentsParentCallback }) {
             setLoading(false);
         }
         getRestaurants();
-    });
+    }, []);
 
     return (
-        <div>
+        <>
             {loading ? (
                 <h1>...</h1>
             ) : (
@@ -166,20 +166,16 @@ function Restaurants({ parentsParentCallback }) {
                     );
                 })
             )}
-        </div>
+        </>
     );
 }
 Restaurants.propTypes = {
-    parentsParentCallback: PropTypes.object.isRequired,
+    parentsParentCallback: PropTypes.func.isRequired,
 };
 
 export default function SideMenu({ parentCallback }) {
     const classes = sideMenuStyles();
     const [open, setOpen] = React.useState(true);
-
-    const handleClick = () => {
-        setOpen(!open);
-    };
 
     return (
         <List
@@ -223,5 +219,5 @@ export default function SideMenu({ parentCallback }) {
 }
 
 SideMenu.propTypes = {
-    parentCallback: PropTypes.object.isRequired,
+    parentCallback: PropTypes.func.isRequired,
 };

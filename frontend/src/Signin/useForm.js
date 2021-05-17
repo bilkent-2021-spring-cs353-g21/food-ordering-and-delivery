@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useHistory } from "react-router-dom";
-
 import { setLocalStorage } from "../Service/localStorage";
-import request from "../Service/request";
 
-const useForm = (callback, validate) => {
+const useForm = (validate) => {
     const [values, setValues] = useState({
         username: "",
         password: "",
@@ -39,19 +36,17 @@ const useForm = (callback, validate) => {
                 setLocalStorage("username", values.username);
                 setLocalStorage("isSignedIn", true);
                 window.location.href = "/manager";
-            } else {
-                setErrors({ username: "Incorrect username or password" });
             }
-
             console.log(response);
         }
 
         if (Object.keys(errors).length === 0 && isSubmitting) {
             checkIfUserExists();
+            //setErrors({ username: "Incorrect username or password" });
         }
     }, [errors]);
 
-    return { handleSubmit, values, errors };
+    return { handleSubmit, values, errors, setValues };
 };
 
 export default useForm;

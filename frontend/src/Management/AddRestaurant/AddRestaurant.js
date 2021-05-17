@@ -2,21 +2,13 @@ import React, { useState, useEffect } from "react";
 import { TextField, InputAdornment, FormControl } from "@material-ui/core";
 import PropTypes from "prop-types";
 import Button from "@material-ui/core/Button";
-import InputLabel from "@material-ui/core/InputLabel";
-import Input from "@material-ui/core/Input";
 import MaskedInput from "react-text-mask";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Select from "@material-ui/core/Select";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import axios from "axios";
 import request from "../../Service/request";
-import useForceUpdate from "use-force-update";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Dialog from "@material-ui/core/Dialog";
-import DialogContentText from "@material-ui/core/DialogContentText";
 
 import useForm from "./useForm";
 import validate from "./validateInfo.js";
@@ -72,12 +64,12 @@ function TextMaskCustom(props) {
     );
 }
 TextMaskCustom.propTypes = {
-    inputRef: PropTypes.object.isRequired,
+    inputRef: PropTypes.func.isRequired,
 };
 
-const AddRestaurant = ({ submitForm }) => {
+const AddRestaurant = () => {
     const [submitResult, setSubmitResult] = useState("");
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -88,7 +80,6 @@ const AddRestaurant = ({ submitForm }) => {
     };
 
     const { handleSubmit, values, errors } = useForm(
-        submitForm,
         validate,
         handleClickOpen,
         setSubmitResult
@@ -305,10 +296,6 @@ const AddRestaurant = ({ submitForm }) => {
             </div>
         </div>
     );
-};
-
-AddRestaurant.propTypes = {
-    submitForm: PropTypes.object.isRequired,
 };
 
 // To customize material ui textfield

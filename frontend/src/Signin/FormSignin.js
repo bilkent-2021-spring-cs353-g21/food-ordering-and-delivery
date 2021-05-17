@@ -22,7 +22,7 @@ const linkStyle = makeStyles({
     },
 });
 
-const FormSignin = ({ submitForm }) => {
+const FormSignin = () => {
     const isSignedIn = getLocalStorage("isSignedIn");
     const history = useHistory();
     if (isSignedIn) {
@@ -30,7 +30,7 @@ const FormSignin = ({ submitForm }) => {
         window.location.href = "/manager";
     }
 
-    const { handleSubmit, values, errors } = useForm(submitForm, validate);
+    const { handleSubmit, values, errors } = useForm(validate);
     const classes = linkStyle();
 
     return (
