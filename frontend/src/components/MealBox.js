@@ -2,21 +2,40 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles, Typography, Box, Divider } from "@material-ui/core";
 import MyButton from "~components/MyButton";
+import { addToBasket } from "~/Service/service";
 
 const CustomBox = withStyles({
     root: {
         backgroundColor: "#FFFFFF",
+        maxWidth: 600,
+        justifyContent: "center",
     },
 })(Box);
 
-const popAdd = (e) => {
-    e.preventDefault();
-};
-
 export default function MealBox(props) {
+    const add = (e) => {
+        e.preventDefault();
+
+        const isSignedIn = localStorage.getItem("isSignedIn");
+
+        const data = {
+            name: props.meal.name,
+            rid: props.meal.rid,
+            quantity: 1,
+        };
+
+        addToBasket(data)
+            .then(() => {
+                props.updateBasket();
+            })
+            .catch((error) => {
+                alert(error);
+            });
+    };
+
     return (
         <CustomBox>
-            <MyButton onClick={popAdd} style={{ float: "right" }}>
+            <MyButton onClick={add} style={{ float: "right" }}>
                 Add
             </MyButton>
             <Typography
@@ -30,12 +49,14 @@ export default function MealBox(props) {
                 {props.meal && props.meal.price}
             </Typography>
             <Typography variant="h6">
-                <b>Chicken Burrito</b>
+                <b>{props.meal && props.meal.name}</b>
             </Typography>
 
             <Typography>
-                Marineted chicken pieces inside tortilla and tomato and potato
-                and citato and bla bla
+                {props.meal &&
+                    (props.meal.description
+                        ? props.meal.description
+                        : "No Description")}{" "}
             </Typography>
             <Divider />
         </CustomBox>
@@ -44,4 +65,5 @@ export default function MealBox(props) {
 
 MealBox.propTypes = {
     meal: PropTypes.object.isRequired,
+    updateBasket: PropTypes.func,
 };

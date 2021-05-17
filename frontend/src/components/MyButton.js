@@ -10,15 +10,10 @@ const StyledButton = withStyles({
         paddingRight: "1em",
         margin: 6,
         "&:hover": {
-            background: "#F2C94C",
+            background: "#cc8c16",
         },
         "&:active": {
-            background: "#bb0a12",
-        },
-        "&:focus": {
-            outline: "none",
-            border: "0.085em solid black",
-            boxShadow: "0 0 0 0.085em white",
+            background: "#F6B028",
         },
     },
 })(Button);

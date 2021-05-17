@@ -30,8 +30,9 @@
         "react-number-format": "^4.5.5",
         "react-router-dom": "^5.2.0",
         "react-scripts": "4.0.3",
-        "swiper": "^6.6.1",
         "react-text-mask": "^5.4.3",
+        "swiper": "^6.6.1",
+        "underscore": "^1.13.1",
         "use-force-update": "^1.0.7",
         "web-vitals": "^1.1.1"
     },

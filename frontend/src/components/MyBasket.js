@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { withStyles, Container, Typography, Box } from "@material-ui/core";
 import MyButton from "./MyButton";
 
@@ -11,7 +12,7 @@ const Basket = withStyles({
     },
 })(Container);
 
-export default function MyBasket() {
+export default function MyBasket(props) {
     return (
         <Basket>
             <Box style={{ backgroundColor: "#F2C94C" }}>
@@ -23,9 +24,17 @@ export default function MyBasket() {
                 </Typography>
             </Box>
             <Box style={{ backgroundColor: "#FFFFFF", paddingBottom: 30 }}>
-                <Typography variant="h6">
-                    Your basket is currently empty
-                </Typography>
+                {!props.basket ? (
+                    <Typography>Your basket is currently empty</Typography>
+                ) : (
+                    <>
+                        <Typography>
+                            <b>{props.basket.name} </b>
+                        </Typography>
+                        <Typography>{props.basket.quantity}</Typography>
+                        <Typography>{props.basket.price}</Typography>
+                    </>
+                )}
             </Box>
 
             <Box
@@ -44,3 +53,7 @@ export default function MyBasket() {
         </Basket>
     );
 }
+
+MyBasket.propTypes = {
+    basket: PropTypes.array.isRequired,
+};

@@ -13,7 +13,6 @@ import {
     withStyles,
 } from "@material-ui/core";
 import { yellow } from "@material-ui/core/colors";
-import { getLocalStorage } from "~/Service/localStorage";
 
 const useStyles = makeStyles({
     boxHeader: {

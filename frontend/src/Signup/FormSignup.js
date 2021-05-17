@@ -5,7 +5,6 @@ import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from "@material-ui/pickers";
-import { useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import validate from "./validateInfo.js";
@@ -19,6 +18,7 @@ import AccountCircle from "@material-ui/icons/AccountCircle";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 import EmailIcon from "@material-ui/icons/Email";
+import { useParams } from "react-router";
 
 const linkStyle = makeStyles({
     link: {
@@ -30,12 +30,7 @@ const linkStyle = makeStyles({
 });
 
 const FormSignup = ({ submitForm }) => {
-    const isSignedIn = getLocalStorage("isSignedIn");
-    const history = useHistory();
-    if (isSignedIn) {
-        history.replace("/managerLanding");
-        window.location.href = "/managerLanding";
-    }
+    const { userType } = useParams();
 
     const { handleSubmit, values, errors } = useForm(submitForm, validate);
     const [selectedDate, handleDateChange] = useState("2000-01-01");
@@ -45,7 +40,7 @@ const FormSignup = ({ submitForm }) => {
         <div className="signup-form-container">
             <form onSubmit={handleSubmit} className="signup-form" noValidate>
                 <h1 className="signup-form-h1">
-                    Sign up as a manager and start delivering food today!
+                    Sign up start starting using the website today!
                 </h1>
                 <div className="signup-form-inputs">
                     <SignupFormBlackTextField
@@ -127,20 +122,23 @@ const FormSignup = ({ submitForm }) => {
                     {errors.password2 && <h2>{errors.password2}</h2>}
                 </div>
                 <br />
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <SignupFormBlackKeyboardDatePicker
-                        autoOk
-                        variant="inline"
-                        inputVariant="outlined"
-                        label="Birth Date"
-                        format="yyyy-MM-dd"
-                        id="birthdate-field"
-                        maxDate={new Date()}
-                        value={selectedDate}
-                        InputAdornmentProps={{ position: "start" }}
-                        onChange={(date) => handleDateChange(date)}
-                    />
-                </MuiPickersUtilsProvider>
+                <div className="signup-form-inputs-date-picker">
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <SignupFormBlackKeyboardDatePicker
+                            autoOk
+                            variant="inline"
+                            inputVariant="outlined"
+                            label="Birth Date"
+                            format="yyyy-MM-dd"
+                            id="birthdate-field"
+                            maxDate={new Date()}
+                            value={selectedDate}
+                            InputAdornmentProps={{ position: "start" }}
+                            onChange={(date) => handleDateChange(date)}
+                        />
+                    </MuiPickersUtilsProvider>
+                </div>
+
                 <br />
                 <div className="signup-form-inputs"></div>
                 <button
@@ -171,7 +169,10 @@ const FormSignup = ({ submitForm }) => {
                 </button>
                 <div className={"signup-form-input-login"}>
                     Already have an account? Click{" "}
-                    <Link className={classes.link} href="/signin">
+                    <Link
+                        className={classes.link}
+                        href={"/" + userType + "/signin"}
+                    >
                         here
                     </Link>{" "}
                     to sign in
@@ -182,7 +183,7 @@ const FormSignup = ({ submitForm }) => {
 };
 
 FormSignup.propTypes = {
-    submitForm: PropTypes.object.isRequired,
+    submitForm: PropTypes.func.isRequired,
 };
 
 // To customize material ui textfield

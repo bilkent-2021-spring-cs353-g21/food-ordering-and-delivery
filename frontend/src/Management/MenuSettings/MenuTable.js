@@ -16,6 +16,7 @@ import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import PropTypes from "prop-types";
 import MaskedInput from "react-text-mask";
@@ -80,10 +81,25 @@ const useStyles = makeStyles({
     },
 });
 
-export default function StickyHeadTable() {
+export default function StickyHeadTable({ mealAdded }) {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
+    const [deleteMeal, setDeleteMeal] = useState(false);
+    const [confirmationOpen, setConfirmationOpen] = useState(false);
+    const [messageOpen, setMessageOpen] = useState(false);
     const [mealIndex, setMealIndex] = useState(0);
+
+    const handleCloseMessage = () => {
+        setMessageOpen(false);
+    };
+
+    const handleClickOpenConfirmation = () => {
+        setConfirmationOpen(true);
+    };
+
+    const handleCloseConfirmation = () => {
+        setConfirmationOpen(false);
+    };
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -95,11 +111,37 @@ export default function StickyHeadTable() {
 
     const [meals, setMeals] = React.useState([]);
 
+    const [values, setValues] = useState({});
+    const [editMeal, setEditMeal] = useState(false);
+    const handleEditMealSubmit = () => {
+        setEditMeal(true);
+    };
+
+    useEffect(() => {
+        async function deleteMealRequest() {
+            const response = await request(
+                axios.delete,
+                "/manager/restaurant/" +
+                    getLocalStorage("rid") +
+                    "/meals/" +
+                    meals[mealIndex].name
+            );
+
+            console.log(response);
+            setDeleteMeal(false);
+            handleCloseConfirmation();
+        }
+
+        if (deleteMeal == true) {
+            deleteMealRequest();
+        }
+    }, [deleteMeal]);
+
     useEffect(() => {
         async function getMeals() {
             const response = await request(
                 axios.get,
-                "/manager/restaurant/" + getLocalStorage("rid") + "/meals"
+                "/restaurant/" + getLocalStorage("rid") + "/meals"
             );
             var meals = [];
 
@@ -121,7 +163,12 @@ export default function StickyHeadTable() {
                             >
                                 <EditIcon style={{ fill: "green" }} />
                             </IconButton>
-                            <IconButton>
+                            <IconButton
+                                onClick={() => {
+                                    handleClickOpenConfirmation();
+                                    setMealIndex(k);
+                                }}
+                            >
                                 <DeleteIcon style={{ fill: "red" }} />
                             </IconButton>
                         </>
@@ -132,7 +179,7 @@ export default function StickyHeadTable() {
             setMeals(meals);
         }
         getMeals();
-    }, []);
+    }, [editMeal, deleteMeal, mealAdded]);
 
     return (
         <Paper className={classes.root}>
@@ -189,81 +236,143 @@ export default function StickyHeadTable() {
                 aria-labelledby="form-dialog-title"
             >
                 <DialogTitle id="form-dialog-title">Edit Meal</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        value={
-                            meals[mealIndex] == null
-                                ? ""
-                                : meals[mealIndex].name
-                        }
-                        autoFocus
-                        margin="dense"
-                        id="name"
-                        label="Name"
-                        fullWidth
-                    />
-                    <TextField
-                        value={
-                            meals[mealIndex] == null
-                                ? ""
-                                : meals[mealIndex].price
-                        }
-                        label="Price"
-                        name="numberformat"
-                        id="formatted-numberformat-input"
-                        type="number"
-                        fullWidth
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                    />
-                    <TextField
-                        value={
-                            meals[mealIndex] == null
-                                ? ""
-                                : meals[mealIndex].type
-                        }
-                        autoFocus
-                        margin="dense"
-                        id="type"
-                        label="Type"
-                        fullWidth
-                    />
-                    <TextField
-                        value={
-                            meals[mealIndex] == null
-                                ? ""
-                                : meals[mealIndex].ingredients
-                        }
-                        autoFocus
-                        helperText="Seperate each ingredient with comma"
-                        margin="dense"
-                        id="ingredients"
-                        label="Ingredients"
-                        fullWidth
-                    />
-                    <TextField
-                        value={
-                            meals[mealIndex] == null
-                                ? ""
-                                : meals[mealIndex].description
-                        }
-                        id="standard-multiline-flexible"
-                        label="Description"
-                        multiline
-                        rowsMax={4}
-                        fullWidth
-                    />
-                </DialogContent>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleEditMealSubmit();
+                        handleClose();
+                    }}
+                >
+                    <DialogContent>
+                        <TextField
+                            defaultValue={
+                                meals[mealIndex] == null
+                                    ? ""
+                                    : meals[mealIndex].name
+                            }
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            label="Name"
+                            fullWidth
+                            required
+                        />
+                        <TextField
+                            defaultValue={
+                                meals[mealIndex] == null
+                                    ? ""
+                                    : meals[mealIndex].price
+                            }
+                            label="Price"
+                            name="numberformat"
+                            id="price"
+                            type="number"
+                            fullWidth
+                            required
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
+                        <TextField
+                            defaultValue={
+                                meals[mealIndex] == null
+                                    ? ""
+                                    : meals[mealIndex].type
+                            }
+                            autoFocus
+                            required
+                            margin="dense"
+                            id="type"
+                            label="Type"
+                            fullWidth
+                        />
+                        <TextField
+                            defaultValue={
+                                meals[mealIndex] == null
+                                    ? ""
+                                    : meals[mealIndex].ingredients
+                            }
+                            autoFocus
+                            required
+                            helperText="Seperate each ingredient with comma"
+                            margin="dense"
+                            id="ingredients"
+                            label="Ingredients"
+                            fullWidth
+                        />
+                        <TextField
+                            defaultValue={
+                                meals[mealIndex] == null
+                                    ? ""
+                                    : meals[mealIndex].description
+                            }
+                            id="description"
+                            label="Description"
+                            multiline
+                            required
+                            rowsMax={4}
+                            fullWidth
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="primary">
+                            Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            onClick={() => {
+                                values.description = document.getElementById(
+                                    "description"
+                                ).value;
+                                values.ingredients = document
+                                    .getElementById("ingredients")
+                                    .value.split(",");
+                                values.name = document.getElementById(
+                                    "name"
+                                ).value;
+                                values.price = document.getElementById(
+                                    "price"
+                                ).value;
+                                values.type = document.getElementById(
+                                    "type"
+                                ).value;
+                            }}
+                            color="primary"
+                        >
+                            Save
+                        </Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
+            <Dialog
+                open={confirmationOpen}
+                onClose={handleCloseConfirmation}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Are you sure you want to delete this meal?"}
+                </DialogTitle>
+                <DialogContent></DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary">
-                        Cancel
+                    <Button onClick={handleCloseConfirmation} color="primary">
+                        No
                     </Button>
-                    <Button onClick={handleClose} color="primary">
-                        Save
+                    <Button
+                        onClick={() => {
+                            setDeleteMeal(true);
+                        }}
+                        color="primary"
+                        autoFocus
+                    >
+                        Yes
                     </Button>
                 </DialogActions>
             </Dialog>
         </Paper>
     );
 }
+
+StickyHeadTable.propTypes = {
+    mealAdded: PropTypes.bool.isRequired,
+};

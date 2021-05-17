@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, TextField, InputAdornment } from "@material-ui/core";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import useForm from "./useForm";
@@ -22,15 +22,10 @@ const linkStyle = makeStyles({
     },
 });
 
-const FormSignin = ({ submitForm }) => {
-    const isSignedIn = getLocalStorage("isSignedIn");
-    const history = useHistory();
-    if (isSignedIn) {
-        history.replace("/manager");
-        window.location.href = "/manager";
-    }
+const FormSignin = () => {
+    const { userType } = useParams();
 
-    const { handleSubmit, values, errors } = useForm(submitForm, validate);
+    const { handleSubmit, values, errors } = useForm(validate);
     const classes = linkStyle();
 
     return (
@@ -90,7 +85,10 @@ const FormSignin = ({ submitForm }) => {
                 </button>
                 <div className="signin-form-input-login">
                     Dont have an account? Click{" "}
-                    <Link className={classes.link} href="/signup">
+                    <Link
+                        className={classes.link}
+                        href={"/" + userType + "/signup"}
+                    >
                         here
                     </Link>{" "}
                     to sign up
@@ -98,10 +96,6 @@ const FormSignin = ({ submitForm }) => {
             </form>
         </div>
     );
-};
-
-FormSignin.propTypes = {
-    submitForm: PropTypes.object.isRequired,
 };
 
 // To customize material ui textfield

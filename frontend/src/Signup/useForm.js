@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import request from "../Service/request";
 import axios from "axios";
+import { useParams } from "react-router";
 
 const useForm = (callback, validate) => {
     const [values, setValues] = useState({
@@ -13,6 +14,7 @@ const useForm = (callback, validate) => {
 
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { userType } = useParams();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -21,16 +23,21 @@ const useForm = (callback, validate) => {
     };
 
     useEffect(() => {
-        async function attemptSignup() {
-            const response = await request(axios.post, "/manager/register", {
-                birthdate: values.birthdate,
-                email: values.email,
-                fullName: values.fullName,
-                password: values.password,
-                username: values.username,
-            });
+        async function attemptSignup(userType) {
+            const response = await request(
+                axios.post,
+                "/" + userType + "/register",
+                {
+                    birthdate: values.birthdate,
+                    email: values.email,
+                    fullName: values.fullName,
+                    password: values.password,
+                    username: values.username,
+                }
+            );
 
             if (response.status == 200) {
+                localStorage.setItem = ("isSignedIn", true);
                 callback();
             } else if (response.status == -1) {
                 // Something really bad happened...
@@ -49,11 +56,11 @@ const useForm = (callback, validate) => {
         }
 
         if (Object.keys(errors).length === 0 && isSubmitting) {
-            attemptSignup();
+            attemptSignup(userType);
         }
     }, [errors]);
 
-    return { handleSubmit, values, errors };
+    return { handleSubmit, values, errors, setValues };
 };
 
 export default useForm;

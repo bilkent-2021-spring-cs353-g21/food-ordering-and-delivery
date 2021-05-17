@@ -6,10 +6,14 @@ import {
     InputBase,
     AppBar,
     Toolbar,
-    fade,
+    Menu,
+    MenuItem,
 } from "@material-ui/core";
 
+import AccountCircle from "@material-ui/icons/AccountCircle";
 import SearchIcon from "@material-ui/icons/Search";
+import MyButton from "./MyButton";
+import { LaptopWindows } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
     logo: {
@@ -19,46 +23,46 @@ const useStyles = makeStyles((theme) => ({
     search: {
         position: "relative",
         float: "right",
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.15),
+        borderRadius: 5,
+        backgroundColor: "rgba(255, 255, 255, 0.5)",
         "&:hover": {
-            backgroundColor: fade(theme.palette.common.white, 0.25),
+            backgroundColor: "rgba(255, 255, 255, 0.35)",
         },
-        marginLeft: 0,
-        width: "100%",
-        [theme.breakpoints.up("sm")]: {
-            marginLeft: theme.spacing(1),
-            width: "auto",
-        },
-    },
-    searchIcon: {
-        padding: theme.spacing(0, 2),
-        height: "100%",
-        position: "absolute",
-        pointerEvents: "none",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        width: "auto",
     },
     inputRoot: {
-        color: "inherit",
+        color: "black",
     },
     inputInput: {
-        padding: theme.spacing(1, 1, 1, 0),
+        padding: 1,
         // vertical padding + font size from searchIcon
-        paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+        paddingLeft: 20,
         transition: theme.transitions.create("width"),
-        width: "100%",
-        [theme.breakpoints.up("sm")]: {
-            width: "12ch",
-            "&:focus": {
-                width: "20ch",
-            },
+        width: "16ch",
+        "&:focus": {
+            width: "28ch",
         },
     },
 }));
 
-export default function MySearch(props) {
+export default function MySearch() {
+    const isSignedIn = localStorage.getItem("isSignedIn");
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleMenu = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const goToSignin = () => {
+        window.location.href = "/signin";
+    };
+
     const classes = useStyles();
 
     return (
@@ -89,6 +93,47 @@ export default function MySearch(props) {
                         <SearchIcon />
                     </IconButton>
                 </div>
+
+                {isSignedIn ? (
+                    <div>
+                        <IconButton
+                            aria-label="account of current user"
+                            aria-controls="menu-appbar"
+                            aria-haspopup="true"
+                            onClick={handleMenu}
+                            color="inherit"
+                        >
+                            <AccountCircle />
+                        </IconButton>
+                        <Menu
+                            id="menu-appbar"
+                            anchorEl={anchorEl}
+                            anchorOrigin={{
+                                vertical: "top",
+                                horizontal: "right",
+                            }}
+                            keepMounted
+                            transformOrigin={{
+                                vertical: "top",
+                                horizontal: "right",
+                            }}
+                            open={open}
+                            onClose={handleClose}
+                        >
+                            <MenuItem onClick={handleClose} href="/profile">
+                                Profile
+                            </MenuItem>
+                            <MenuItem onClick={handleClose} href="/myaccount">
+                                Edit Address
+                            </MenuItem>
+                            <MenuItem onClick={handleClose} href="/">
+                                Log out
+                            </MenuItem>
+                        </Menu>
+                    </div>
+                ) : (
+                    <MyButton onClick={goToSignin}>Sign in</MyButton>
+                )}
             </Toolbar>
         </AppBar>
     );

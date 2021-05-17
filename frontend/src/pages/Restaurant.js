@@ -5,13 +5,10 @@ import {
     fade,
     Container,
 } from "@material-ui/core";
-import React from "react";
-{
-    /*import backgroundImg from "~/assets/landing_background.jpg";*/
-}
+import React, { useEffect, useState } from "react";
+import backgroundImg from "~/assets/background.jpg";
 import SiteHeader from "~/components/SiteHeader";
 import MyBasket from "~/components/MyBasket";
-import MealBox from "~/components/MealBox";
 
 import "swiper/swiper.min.css";
 import "swiper/components/pagination/pagination.min.css";
@@ -20,6 +17,10 @@ import "./styles.css";
 
 // import Swiper core and required modules
 import SwiperCore, { Pagination } from "swiper/core";
+import RestaurantBox from "~/components/RestaurantBox";
+import { getBasket, getMeals } from "~/Service/service";
+import _ from "underscore";
+import { useParams } from "react-router";
 
 // install Swiper modules
 SwiperCore.use([Pagination]);
@@ -130,73 +131,86 @@ const useStyles = makeStyles((theme) => ({
         maxWidth: 200,
     },
     info: {
-        paddingTop: 10,
+        padding: 15,
         display: "flex",
     },
 }));
 
-export default function Landing() {
+export default function Restaurant() {
+    const { rid } = useParams();
+    const [meals, setMeals] = useState();
+    const [basket, setBasket] = useState();
     const classes = useStyles();
 
+    useEffect(() => {
+        updateBasket();
+        getMeals(rid)
+            .then((response) => {
+                setMeals(response.data.data);
+            })
+            .catch((error) => {
+                alert(error);
+            });
+    }, [rid]);
+
+    const updateBasket = () => {
+        getBasket().then((response) => {
+            setBasket(response.data.data);
+        });
+    };
+
     return (
-        <>
-            <SiteHeader />
+        <div
+            style={{
+                background: `linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.9)), url(${backgroundImg})`,
+                minHeight: 750,
+            }}
+        >
+            <>
+                <SiteHeader />
 
-            <Container className={classes.searchFilters}>
-                <Box className={classes.boxHeader}>
-                    <Typography
-                        variant="h6"
-                        style={{ display: "flex", justifyContent: "center" }}
-                    >
-                        Ustamin El Isi
-                    </Typography>
-                </Box>
-                <Box style={{ backgroundColor: "#FFFFFF" }}>
-                    <Typography variant="h7" className={classes.info}>
-                        Status: Open
-                    </Typography>
-                    <Typography variant="h7" className={classes.info}>
-                        Contact: +903122667254
-                    </Typography>
-                    <Typography variant="h7" className={classes.info}>
-                        Address: Ankara, Bahcelievler
-                    </Typography>
-                </Box>
-            </Container>
+                <Container className={classes.searchFilters}>
+                    <Box className={classes.boxHeader}>
+                        <Typography
+                            variant="h6"
+                            style={{
+                                display: "flex",
+                                justifyContent: "center",
+                            }}
+                        >
+                            Ustamin El Isi
+                        </Typography>
+                    </Box>
+                    <Box style={{ backgroundColor: "#FFFFFF" }}>
+                        <Typography className={classes.info}>
+                            Contact: +903122667254
+                        </Typography>
+                        <Typography className={classes.info}>
+                            Address: Ankara, Bahcelievler
+                        </Typography>
+                    </Box>
+                </Container>
 
-            <Container
-                maxWidth="md"
-                style={{
-                    marginTop: 40,
-                    position: "relative",
-                    left: "10%",
-                }}
-            >
-                <Box className={classes.boxHeader}>
-                    <Typography
-                        variant="h5"
-                        style={{ display: "flex", justifyContent: "center" }}
-                    >
-                        Ana Yemekler
-                    </Typography>
-                </Box>
-                <MealBox />
-                <MealBox />
-                <MealBox />
+                {(() => {
+                    if (meals) {
+                        const temp = _.groupBy(meals, (meal) => meal.type);
+                        const entries = Object.entries(temp);
+                        console.log(entries);
+                        return entries.map((entry, i) => {
+                            return (
+                                <RestaurantBox
+                                    data={entry[1]}
+                                    type={entry[0]}
+                                    key={i}
+                                    updateBasket={updateBasket}
+                                />
+                            );
+                        });
+                    }
+                })()}
 
-                <Box className={classes.boxHeader}>
-                    <Typography
-                        variant="h5"
-                        style={{ display: "flex", justifyContent: "center" }}
-                    >
-                        Chef&apos;s Special
-                    </Typography>
-                </Box>
-                <MealBox />
-                <MealBox />
-            </Container>
-
-            <MyBasket />
-        </>
+                {basket && <MyBasket basket={basket} />}
+            </>
+        </div>
     );
 }

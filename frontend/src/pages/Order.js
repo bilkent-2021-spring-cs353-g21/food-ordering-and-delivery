@@ -1,18 +1,9 @@
-import {
-    makeStyles,
-    Paper,
-    AppBar,
-    Link,
-    Toolbar,
-    fade,
-    Container,
-} from "@material-ui/core";
+import { makeStyles, Paper, fade } from "@material-ui/core";
 import React from "react";
 {
     /*import backgroundImg from "~/assets/landing_background.jpg";*/
 }
 import adImg from "~/assets/ad.jpg";
-import MyButton from "~/components/MyButton";
 import SiteHeader from "~/components/SiteHeader";
 
 const useStyles = makeStyles((theme) => ({
@@ -109,53 +100,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Landing() {
-    const isSignedIn = localStorage.getItem("isSignedIn");
-    let city = localStorage.getItem("city");
-    let district = localStorage.getItem("district");
-
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-
-    const handleMenu = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const confirm = (e) => {
-        e.preventDefault();
-
-        city = e.target.city.value;
-        district = e.target.district.value;
-
-        localStorage.setItem("city", city);
-        localStorage.setItem("district", district);
-
-        window.location.href = "/";
-    };
-
-    const [state, setState] = React.useState({
-        city: "",
-        district: "",
-    });
-
-    const handleChange = (event) => {
-        const name = event.target.name;
-        setState({
-            ...state,
-            [name]: event.target.value,
-        });
-    };
-
+export default function Restaurant() {
     const classes = useStyles();
 
     return (
         <>
             <SiteHeader />
-
             <Paper
                 className={classes.panel}
                 style={{

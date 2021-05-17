@@ -166,7 +166,7 @@ export default function SearchResults(props) {
                         variant="h5"
                         style={{ display: "flex", justifyContent: "center" }}
                     >
-                        Caqqolunun yeri
+                        Ev yemekleri
                     </Typography>
                 </Box>
                 <MealBox />
@@ -176,7 +176,7 @@ export default function SearchResults(props) {
                         variant="h5"
                         style={{ display: "flex", justifyContent: "center" }}
                     >
-                        Caqqolunun yeri
+                        Abimin doneri
                     </Typography>
                 </Box>
                 <MealBox />
