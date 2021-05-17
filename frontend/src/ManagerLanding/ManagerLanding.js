@@ -21,6 +21,7 @@ import AddRestaurant from "../Management/AddRestaurant/AddRestaurant";
 import { setLocalStorage, getLocalStorage } from "../Service/localStorage";
 import RestaurantSettings from "../Management/RestaurantSettings/RestaurantSettings";
 import { Orders } from "../Management/Orders/Orders";
+import { Comments } from "../Management/Comments/Comments";
 import { MenuSettings } from "../Management/MenuSettings/MenuSettings";
 
 const drawerWidth = 220;
@@ -63,6 +64,8 @@ class ManagerLanding extends React.Component {
                     return <RestaurantSettings></RestaurantSettings>;
                 case 4:
                     return <Orders></Orders>;
+                case 5:
+                    return <Comments></Comments>;
                 case 6:
                     return <MenuSettings></MenuSettings>;
             }
@@ -70,7 +73,9 @@ class ManagerLanding extends React.Component {
     }
 
     render() {
-        const { classes } = this.props;
+        const { classes, theme } = this.props;
+        const { anchorEl } = this.state;
+        const open = Boolean(anchorEl);
         const { history } = this.props;
         const isSignedIn = getLocalStorage("isSignedIn");
         if (!isSignedIn) {
@@ -109,7 +114,7 @@ class ManagerLanding extends React.Component {
                             className={classes.title}
                             noWrap
                         >
-                            {this.state.pageSelection}
+                            ORDER.COM
                         </Typography>
                         <div>
                             <Button

@@ -37,12 +37,11 @@ const useForm = (validate) => {
                 setLocalStorage("isSignedIn", true);
                 window.location.href = "/landing";
             }
-            console.log(response);
         }
 
         if (Object.keys(errors).length === 0 && isSubmitting) {
             checkIfUserExists();
-            //setErrors({ username: "Incorrect username or password" });
+            setErrors({ username: "Invalid username or password." });
         }
     }, [errors]);
 

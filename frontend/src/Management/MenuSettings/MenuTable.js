@@ -86,12 +86,7 @@ export default function StickyHeadTable({ mealAdded }) {
     const [open, setOpen] = useState(false);
     const [deleteMeal, setDeleteMeal] = useState(false);
     const [confirmationOpen, setConfirmationOpen] = useState(false);
-    const [messageOpen, setMessageOpen] = useState(false);
     const [mealIndex, setMealIndex] = useState(0);
-
-    const handleCloseMessage = () => {
-        setMessageOpen(false);
-    };
 
     const handleClickOpenConfirmation = () => {
         setConfirmationOpen(true);
@@ -113,9 +108,33 @@ export default function StickyHeadTable({ mealAdded }) {
 
     const [values, setValues] = useState({});
     const [editMeal, setEditMeal] = useState(false);
+
     const handleEditMealSubmit = () => {
         setEditMeal(true);
     };
+
+    useEffect(() => {
+        async function editMealRequest() {
+            const response = await request(
+                axios.patch,
+                "/manager/restaurant/" + getLocalStorage("rid") + "/meals",
+                {
+                    description: values.description,
+                    ingredients: values.ingredients,
+                    name: values.name,
+                    price: values.price,
+                    type: values.type,
+                }
+            );
+
+            console.log(response);
+            setEditMeal(false);
+        }
+
+        if (editMeal == true) {
+            editMealRequest();
+        }
+    }, [editMeal]);
 
     useEffect(() => {
         async function deleteMealRequest() {
@@ -245,6 +264,7 @@ export default function StickyHeadTable({ mealAdded }) {
                 >
                     <DialogContent>
                         <TextField
+                            disabled
                             defaultValue={
                                 meals[mealIndex] == null
                                     ? ""

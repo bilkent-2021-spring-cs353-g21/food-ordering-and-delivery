@@ -3,6 +3,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
+import DialogContent from "@material-ui/core/DialogContent";
+import TextField from "@material-ui/core/TextField";
+
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
@@ -18,7 +21,7 @@ import NumberFormat from "react-number-format";
 import axios from "axios";
 import request from "../../Service/request";
 import { getLocalStorage } from "../../Service/localStorage";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import ChatIcon from "@material-ui/icons/Chat";
 
 function NumberFormatCustom(props) {
     const { inputRef, onChange, ...other } = props;
@@ -49,30 +52,54 @@ NumberFormatCustom.propTypes = {
 };
 
 const columns = [
-    { id: "content", label: "Content", minWidth: 300 },
-
-    { id: "placedTime", label: "Order Placed Time", minWidth: 100 },
-    { id: "requestTime", label: "Delivery Request Time", minWidth: 100 },
-    { id: "status", label: "Status", minWidth: 50 },
+    { id: "placedTime", label: "Placed Time", minWidth: 160 },
     {
-        id: "price",
-        label: "Price",
+        id: "requestedDeliveryTime",
+        label: "Requested Delivery Time",
+        minWidth: 160,
+    },
+    {
+        id: "status",
+        label: "Status",
+        minWidth: 50,
+    },
+    {
+        id: "cost",
+        label: "Cost",
         minWidth: 50,
         format: (value) => value.toLocaleString("en-US"),
     },
-    { id: "actions", label: "Finalize" },
+    { id: "restaurantScore", label: "Restaurant Score", minWidth: 50 },
+    { id: "deliveryScore", label: "Delivery Score", minWidth: 50 },
+    { id: "text", label: "Text", minWidth: 100 },
+    { id: "response", label: "Response", minWidth: 100 },
+    { id: "reply", label: "Reply" },
 ];
 
 function createData(
-    content,
     placedTime,
-    requestTime,
+    requestedDeliveryTime,
     status,
-    price,
-    actions,
+    cost,
+    restaurantScore,
+    deliveryScore,
+    text,
+    response,
+    reply,
     oid
 ) {
-    return { content, placedTime, requestTime, status, price, actions, oid };
+    return {
+        placedTime,
+        requestedDeliveryTime,
+        status,
+        cost,
+        restaurantScore,
+        deliveryScore,
+        text,
+        response,
+        reply,
+        oid,
+    };
 }
 
 const useStyles = makeStyles({
@@ -90,10 +117,10 @@ export default function StickyHeadTable() {
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [totalOrders, setTotalOrders] = useState(0);
-    const [orderIndex, setOrderIndex] = useState(0);
-    const [orders, setOrders] = useState([]);
-    const [finalize, setFinalize] = useState(false);
+    const [totalComments, setTotalComments] = useState(0);
+    const [commentIndex, setCommentIndex] = useState(0);
+    const [comments, setComments] = useState([]);
+    const [reply, setReply] = useState(false);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -101,6 +128,7 @@ export default function StickyHeadTable() {
 
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(+event.target.value);
+
         setPage(0);
     };
 
@@ -115,129 +143,72 @@ export default function StickyHeadTable() {
     };
 
     const handleClose_ = () => {
-        setFinalize(true);
+        setReply(true);
         setOpen(false);
     };
 
-    useEffect(() => {
-        async function finalizeOrder() {
-            const response = await request(
-                axios.post,
-                "/manager/restaurant/" +
-                    getLocalStorage("rid") +
-                    " /orders/" +
-                    orders[orderIndex]["oid"] +
-                    "/request_delivery"
-            );
-            console.log(orders[orderIndex]["oid"]);
-        }
-
-        if (finalize == true) {
-            finalizeOrder();
-            setFinalize(false);
-        }
-    }, [finalize]);
-
-    useEffect(() => {
-        async function getOrders() {
-            const response = await request(
-                axios.get,
-                "/manager/restaurant/" +
-                    getLocalStorage("rid") +
-                    "/orders?page=" +
-                    page +
-                    "&limit=10"
-            );
-            var orders = [];
-            for (var i in response.data.data.orders) {
-                const k = i;
-                var content = "";
-
-                for (var j in response.data.data.orders[i]["content"]) {
-                    content =
-                        Object.keys(response.data.data.orders[i]["content"][j])
-                            .map(function (k) {
-                                if (k == "quantity") {
-                                    return (
-                                        "x" +
-                                        response.data.data.orders[i]["content"][
-                                            j
-                                        ][k] +
-                                        ""
-                                    );
-                                }
-                                if (k == "mealPrice") {
-                                    return (
-                                        "price: " +
-                                        response.data.data.orders[i]["content"][
-                                            j
-                                        ][k]
-                                    );
-                                }
-                                if (k == "ingredients") {
-                                    return (
-                                        "ingredients: " +
-                                        response.data.data.orders[i]["content"][
-                                            j
-                                        ][k].join()
-                                    );
-                                }
-                                return response
-                                    .data.data.orders[i]["content"][j][k];
-                            })
-                            .join(" ") + "\n";
-                }
-
-                const action = () => {
-                    if (response.data.data.orders[i]["status"] != "COOKING") {
-                        return <></>;
-                    }
-                    return (
-                        <>
-                            <IconButton
-                                onClick={() => {
-                                    handleClickOpen();
-                                    setOrderIndex(k);
-                                }}
-                            >
-                                <CheckCircleIcon style={{ fill: "blue" }} />
-                            </IconButton>
-                        </>
-                    );
-                };
-                orders.push(
-                    createData(
-                        content,
-                        response.data.data.orders[i]["placedTime"],
-                        response.data.data.orders[i]["requestedDeliveryTime"],
-                        response.data.data.orders[i]["status"],
-                        response.data.data.orders[i]["cost"],
-                        action(),
-                        response.data.data.orders[i]["oid"]
-                    )
-                );
-            }
-            setOrders(orders);
-        }
-
-        getOrders();
-    }, [page, finalize]);
+    useEffect(() => {}, [reply]);
 
     useEffect(() => {
         async function getTotal() {
             const response = await request(
                 axios.get,
-                "/manager/restaurant/" +
-                    getLocalStorage("rid") +
-                    "/orders?0=1&limit=1"
+                "/manager/restaurant/" + getLocalStorage("rid") + "/comments"
             );
 
-            setTotalOrders(response.data.data.totalOrders);
-            console.log(response.data.data.totalOrders);
+            setTotalComments(response.data.data.totalComments);
         }
 
         getTotal();
-    }, [page, finalize]);
+    }, [page]);
+
+    useEffect(() => {
+        async function getComments() {
+            var page_ = page;
+            console.log(page_);
+            const response = await request(
+                axios.get,
+                "/manager/restaurant/" + getLocalStorage("rid") + "/comments",
+                {
+                    limit: 10,
+                    page: page_,
+                }
+            );
+
+            var comments = [];
+            for (var i in response.data.data.comments) {
+                const k = i;
+                comments.push(
+                    createData(
+                        response.data.data.comments[i].order["placedTime"],
+                        response.data.data.comments[i].order[
+                            "requestedDeliveryTime"
+                        ],
+                        response.data.data.comments[i].order["status"],
+                        response.data.data.comments[i].order["cost"],
+                        response.data.data.comments[i]["restaurantScore"],
+                        response.data.data.comments[i]["deliveryScore"],
+                        response.data.data.comments[i]["text"],
+                        response.data.data.comments[i]["response"],
+                        <>
+                            <IconButton
+                                onClick={() => {
+                                    handleClickOpen();
+                                    setCommentIndex(k);
+                                }}
+                            >
+                                <ChatIcon style={{ fill: "black" }} />
+                            </IconButton>
+                        </>,
+                        response.data.data.comments[i].order["oid"]
+                    )
+                );
+            }
+            setComments(comments);
+        }
+
+        getComments();
+    }, [page]);
 
     return (
         <Paper className={classes.root}>
@@ -257,16 +228,16 @@ export default function StickyHeadTable() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {orders.map((orders) => {
+                        {comments.map((comments) => {
                             return (
                                 <TableRow
                                     hover
                                     role="checkbox"
                                     tabIndex={-1}
-                                    key={orders.code}
+                                    key={comments.code}
                                 >
                                     {columns.map((column) => {
-                                        const value = orders[column.id];
+                                        const value = comments[column.id];
                                         return (
                                             <TableCell
                                                 key={column.id}
@@ -288,7 +259,7 @@ export default function StickyHeadTable() {
             <TablePagination
                 rowsPerPageOptions={[10]}
                 component="div"
-                count={totalOrders}
+                count={totalComments}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onChangePage={handleChangePage}
@@ -299,9 +270,18 @@ export default function StickyHeadTable() {
                 onClose={handleClose}
                 aria-labelledby="form-dialog-title"
             >
-                <DialogTitle id="form-dialog-title">
-                    Do you want to finalize this order?
-                </DialogTitle>
+                <DialogTitle id="form-dialog-title">Reply</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        required
+                        margin="dense"
+                        id="name"
+                        label="Reply"
+                        fullWidth
+                        multiline
+                        rowsMax={4}
+                    />
+                </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
                         Cancel
