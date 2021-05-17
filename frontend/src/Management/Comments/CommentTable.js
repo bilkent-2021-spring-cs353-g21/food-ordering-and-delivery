@@ -3,6 +3,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
+import DialogContent from "@material-ui/core/DialogContent";
+import TextField from "@material-ui/core/TextField";
+
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
@@ -267,9 +270,18 @@ export default function StickyHeadTable() {
                 onClose={handleClose}
                 aria-labelledby="form-dialog-title"
             >
-                <DialogTitle id="form-dialog-title">
-                    Do you want to finalize this order?
-                </DialogTitle>
+                <DialogTitle id="form-dialog-title">Reply</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        required
+                        margin="dense"
+                        id="name"
+                        label="Reply"
+                        fullWidth
+                        multiline
+                        rowsMax={4}
+                    />
+                </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
                         Cancel

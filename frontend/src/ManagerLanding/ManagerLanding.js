@@ -114,7 +114,7 @@ class ManagerLanding extends React.Component {
                             className={classes.title}
                             noWrap
                         >
-                            {this.state.pageSelection}
+                            ORDER.COM
                         </Typography>
                         <div>
                             <Button

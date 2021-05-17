@@ -41,6 +41,7 @@ const useForm = (validate) => {
 
         if (Object.keys(errors).length === 0 && isSubmitting) {
             checkIfUserExists();
+            setErrors({ username: "Invalid username or password." });
         }
     }, [errors]);
 
