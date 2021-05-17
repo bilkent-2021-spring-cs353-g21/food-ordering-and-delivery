@@ -6,6 +6,10 @@ import Restaurant from "./pages/Restaurant";
 import Order from "./pages/Order";
 import Signin from "./Signin/Signin";
 import Signup from "./Signup/Signup";
+import Home from "./Home";
+import ManagerLanding from "./ManagerLanding/ManagerLanding";
+import DelivererLanding from "./DelivererLanding/DelivererLanding";
+import DelivererSignup from "./DelivererSignup/DelivererSignup";
 
 function App() {
     return (
@@ -17,6 +21,19 @@ function App() {
                 <Route path="/:userType/signup" component={Signup}></Route>
                 <Route exact path="/landing" component={Landing}></Route>
                 <Route exact path="/order" component={Order}></Route>
+
+                <Route exact path="/" component={Home}></Route>
+                <Route exact path="/manager" component={ManagerLanding}></Route>
+                <Route
+                    exact
+                    path="/deliverer"
+                    component={DelivererSignup}
+                ></Route>
+                <Route
+                    exact
+                    path="/delivererLanding"
+                    component={DelivererLanding}
+                ></Route>
             </Switch>
         </Router>
     );

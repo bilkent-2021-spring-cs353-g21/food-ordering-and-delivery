@@ -106,7 +106,6 @@ export default function StickyHeadTable() {
 
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(+event.target.value);
-
         setPage(0);
     };
 

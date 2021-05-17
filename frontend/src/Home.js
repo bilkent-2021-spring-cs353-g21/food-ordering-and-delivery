@@ -12,7 +12,12 @@ const Home = () => {
             }}
         >
             <Link href="/signin">Sign in</Link>
+            <br></br>
             <Link href="/signup">Sign up</Link>
+            <br></br>
+            <Link href="/deliverer">Deliverer Sign up</Link>
+            <br></br>
+
         </div>
     );
 };
