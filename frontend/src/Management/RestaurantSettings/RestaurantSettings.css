@@ -1,0 +1,100 @@
+.restaurant-settings-container {
+    width: 550px;
+    box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 7px 20px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 30px;
+    background: linear-gradient(
+        to bottom,
+        rgb(238, 197, 16),
+        rgb(238, 197, 16) 9%,
+        rgb(255, 255, 255) 7%,
+        rgb(255, 255, 255) 100%
+    );
+    height: 700px;
+    display: grid;
+    position: relative;
+    margin: auto;
+    margin-top: 50px;
+    padding: 20px 20px;
+}
+
+.restaurant-settings-inputs {
+    margin-bottom: 0.1rem;
+    margin-top: 0rem;
+    width: 70%;
+}
+
+.restaurant-settings-inputs h2 {
+    font-size: 0.8rem;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    color: #f00e0e;
+}
+
+.restaurant-settings h1 {
+    font-family: "Times New Roman";
+    font-weight: normal;
+    font-size: 2.2rem;
+    text-align: start;
+    width: 90%;
+    text-align: center;
+    color: rgb(0, 0, 0);
+    position: fixed;
+    top: 6%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.restaurant-settings-login {
+    font-size: 1.3rem;
+    text-align: start;
+    width: 80%;
+    color: rgb(0, 0, 0);
+    text-align: center;
+    font-family: "Times New Roman";
+    position: fixed;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.restaurant-settings {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.restaurant-settings-inputs-p {
+    font-size: 0.8rem;
+    margin-top: 0rem;
+    color: #f00e0e;
+}
+
+.restaurant-settings-label {
+    display: inline-block;
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+    color: #fff;
+}
+
+.restaurant-settings-input {
+    display: block;
+    padding-left: 20px;
+    outline-color: rgb(0, 0, 0);
+    border-radius: 5px;
+    height: 50px;
+    width: 100%;
+    border-color: rgb(24, 24, 24);
+}
+
+.restaurant-settings-input::placeholder {
+    color: #595959;
+    font-size: 15px;
+    font-family: "Times New Roman";
+}
