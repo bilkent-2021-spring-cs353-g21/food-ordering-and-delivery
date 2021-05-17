@@ -17,10 +17,12 @@ import SideMenu from "./SideMenu";
 import { Link } from "react-router-dom";
 
 import { setLocalStorage, getLocalStorage } from "../Service/localStorage";
+import Profile from "../Deliverer/ProfileSettings/Profile";
+import Deliveries from "../Deliverer/Deliveries/DeliveryTable";
 
 const drawerWidth = 220;
 
-class ManagerLanding extends React.Component {
+class DelivererLanding extends React.Component {
     constructor() {
         super();
         this.state = {
@@ -53,13 +55,7 @@ class ManagerLanding extends React.Component {
                 case 1:
                     return <Profile></Profile>;
                 case 2:
-                    return <AddRestaurant></AddRestaurant>;
-                case 3:
-                    return <RestaurantSettings></RestaurantSettings>;
-                case 4:
-                    return <Orders></Orders>;
-                case 6:
-                    return <MenuSettings></MenuSettings>;
+                    return <Deliveries></Deliveries>
             }
         };
     }
@@ -152,7 +148,7 @@ class ManagerLanding extends React.Component {
     }
 }
 
-ManagerLanding.propTypes = {
+DelivererLanding.propTypes = {
     classes: PropTypes.object.isRequired,
     theme: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
@@ -256,4 +252,4 @@ const styles = (theme) => ({
     },
 });
 
-export default withStyles(styles, { withTheme: true })(ManagerLanding);
+export default withStyles(styles, { withTheme: true })(DelivererLanding);

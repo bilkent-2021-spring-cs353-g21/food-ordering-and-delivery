@@ -16,7 +16,7 @@ import AccountCircle from "@material-ui/icons/AccountCircle";
 import CommentIcon from "@material-ui/icons/Comment";
 import Divider from "@material-ui/core/Divider";
 import { getLocalStorage, setLocalStorage } from "../Service/localStorage";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
+import MotorcycleIcon from '@material-ui/icons/Motorcycle';
 import PropTypes from "prop-types";
 import axios from "axios";
 import request from "../Service/request";
@@ -212,9 +212,9 @@ export default function SideMenu({ parentCallback }) {
                 }}
             >
                 <ListItemIcon>
-                    <AddCircleIcon />
+                    <MotorcycleIcon />
                 </ListItemIcon>
-                <ListItemText primary="Add Restaurant" />
+                <ListItemText primary="Show Deliveries" />
             </ListItem>
             <Divider />
             <Restaurants parentsParentCallback={parentCallback}></Restaurants>
