@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import tr.com.bilkent.fods.config.MapperConfig;
+import tr.com.bilkent.fods.dto.order.DelivererOrderDTO;
 import tr.com.bilkent.fods.dto.order.OrderContentDTO;
 import tr.com.bilkent.fods.dto.order.OrderDTO;
 import tr.com.bilkent.fods.dto.order.OrderWithoutContentDTO;
@@ -24,4 +25,9 @@ public interface OrderMapper {
     List<OrderContentDTO> orderContentsToOrderContentDtos(List<OrderContent> orderContents);
 
     OrderWithoutContentDTO orderToOrderWithoutContentDto(Order order);
+
+    @Mapping(target = "restaurantName", source = "fromRestaurant.name")
+    DelivererOrderDTO orderToDelivererOrderDto(Order order);
+
+    List<DelivererOrderDTO> ordersToDelivererOrderDtos(List<Order> orders);
 }

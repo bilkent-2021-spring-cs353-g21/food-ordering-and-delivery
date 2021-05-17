@@ -21,6 +21,7 @@ public class Comment {
     private Long oid;
 
     @OneToOne
+    @MapsId
     @JoinColumn(name = "oid")
     private Order order;
 

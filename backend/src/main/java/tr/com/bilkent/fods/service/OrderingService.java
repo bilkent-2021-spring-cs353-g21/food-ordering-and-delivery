@@ -135,7 +135,7 @@ public class OrderingService {
         }
 
         order.setPlacedTime(Timestamp.from(Instant.now()));
-        order.setStatus(OrderStatus.WAITING);
+        order.setStatus(OrderStatus.COOKING);
         order.setRequestedDeliveryTime(requestedDeliveryTime);
         order.setDestination(destination);
         order = orderRepository.save(order);
